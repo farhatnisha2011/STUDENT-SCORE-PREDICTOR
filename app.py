@@ -1,6 +1,7 @@
 import streamlit as st
 import joblib
 import pandas as pd
+import matplotlib.pyplot as plt
 
 # =========================
 # LOAD MODEL
@@ -83,7 +84,7 @@ if st.button("Predict Score"):
     # =========================
     st.success(f"🎯 Predicted Exam Score: {final_score}")
     st.balloons()
-    #import matplotlib.pyplot as plt
+    
 
 # =========================
 # DONUT CHART
