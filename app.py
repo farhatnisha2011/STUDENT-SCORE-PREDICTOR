@@ -1,7 +1,7 @@
 import streamlit as st
 import joblib
 import pandas as pd
-import matplotlib.pyplot as plt
+
 
 # =========================
 # LOAD MODEL
@@ -86,22 +86,5 @@ if st.button("Predict Score"):
     st.balloons()
     
 
-# =========================
-# DONUT CHART
-# =========================
-remaining = 100 - final_score
 
-fig, ax = plt.subplots()
-
-ax.pie(
-    [final_score, remaining],
-    labels=["Score", "Remaining"],
-    autopct="%1.1f%%",
-    startangle=90,
-    wedgeprops=dict(width=0.4)   # Makes donut shape
-)
-
-ax.set_title("Predicted Score Donut Chart")
-
-st.pyplot(fig)
     
