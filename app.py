@@ -83,3 +83,24 @@ if st.button("Predict Score"):
     # =========================
     st.success(f"🎯 Predicted Exam Score: {final_score}")
     st.balloons()
+    import matplotlib.pyplot as plt
+
+# =========================
+# DONUT CHART
+# =========================
+remaining = 100 - final_score
+
+fig, ax = plt.subplots()
+
+ax.pie(
+    [final_score, remaining],
+    labels=["Score", "Remaining"],
+    autopct="%1.1f%%",
+    startangle=90,
+    wedgeprops=dict(width=0.4)   # Makes donut shape
+)
+
+ax.set_title("Predicted Score Donut Chart")
+
+st.pyplot(fig)
+    
