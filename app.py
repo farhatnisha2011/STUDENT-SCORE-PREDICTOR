@@ -83,7 +83,7 @@ if st.button("Predict Score"):
     # =========================
     st.success(f"🎯 Predicted Exam Score: {final_score}")
     st.balloons()
-    import matplotlib.pyplot as plt
+    #import matplotlib.pyplot as plt
 
 # =========================
 # DONUT CHART
