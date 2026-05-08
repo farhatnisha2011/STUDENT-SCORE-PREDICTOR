@@ -177,35 +177,45 @@ if st.button("Predict Score"):
     # =========================
     st.balloons()
 # =========================
-# DARK THEME CSS
+# DARK THEME CSS FIXED
 # =========================
 st.markdown("""
 <style>
 
-/* Full App Background */
+/* App Background */
 .stApp {
     background: linear-gradient(to right, #141E30, #243B55);
+}
+
+/* All Text Color */
+html, body, [class*="css"]  {
     color: white;
 }
 
-/* Main Title */
+/* Title */
 h1 {
-    color: #00FFD1;
+    color: #00FFD1 !important;
     text-align: center;
     font-size: 42px;
 }
 
-/* Text */
-p, label, div {
+/* Labels */
+label {
+    color: white !important;
+    font-weight: bold;
+}
+
+/* Paragraph Text */
+p {
     color: white !important;
 }
 
-/* Input Fields */
+/* Input Boxes */
 .stNumberInput input {
-    background-color: #1E1E1E;
-    color: white;
+    background-color: #1E1E1E !important;
+    color: white !important;
     border-radius: 10px;
-    border: 1px solid #444;
+    border: 1px solid #555;
 }
 
 /* Selectbox */
@@ -215,7 +225,12 @@ div[data-baseweb="select"] {
     color: white !important;
 }
 
-/* Predict Button */
+/* Dropdown Text */
+div[data-baseweb="select"] * {
+    color: white !important;
+}
+
+/* Button */
 .stButton > button {
     background: linear-gradient(to right, #00C9FF, #92FE9D);
     color: black;
@@ -234,20 +249,18 @@ div[data-baseweb="select"] {
     box-shadow: 0px 0px 20px rgba(0,255,200,0.5);
 }
 
-/* Success Message */
+/* Success Box */
 .stSuccess {
-    background-color: #16213E;
-    color: white;
+    background-color: #16213E !important;
+    color: white !important;
     border-radius: 10px;
-    padding: 10px;
 }
 
-/* Info Message */
+/* Info Box */
 .stInfo {
-    background-color: #0F3460;
-    color: white;
+    background-color: #0F3460 !important;
+    color: white !important;
     border-radius: 10px;
-    padding: 10px;
 }
 
 /* Progress Bar */
