@@ -176,6 +176,9 @@ if st.button("Predict Score"):
     # CELEBRATION
     # =========================
     st.balloons()
+st.markdown("""
+<style>
+
 /* Selectbox Box */
 div[data-baseweb="select"] {
     background-color: #1E1E1E !important;
@@ -199,8 +202,11 @@ li {
     color: white !important;
 }
 
-/* Hover on Dropdown */
+/* Hover Effect */
 li:hover {
     background-color: #333 !important;
 }
+
+</style>
+""", unsafe_allow_html=True)
 
