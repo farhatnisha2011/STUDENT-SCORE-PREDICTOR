@@ -18,7 +18,7 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-/* App Background */
+/* Background */
 .stApp {
     background: linear-gradient(to right, #0F2027, #203A43, #2C5364);
 }
@@ -50,7 +50,7 @@ label {
     border: 1px solid #555;
 }
 
-/* Selectbox Main */
+/* Selectbox */
 div[data-baseweb="select"] > div {
     background-color: #111111 !important;
     color: white !important;
@@ -58,7 +58,7 @@ div[data-baseweb="select"] > div {
     border: 1px solid #555 !important;
 }
 
-/* Selected Text */
+/* Selectbox Text */
 div[data-baseweb="select"] span {
     color: white !important;
 }
@@ -69,7 +69,7 @@ ul {
     border-radius: 10px !important;
 }
 
-/* Dropdown Options */
+/* Dropdown Items */
 li {
     background-color: #111111 !important;
     color: white !important;
@@ -94,7 +94,7 @@ li:hover {
     transition: 0.3s ease;
 }
 
-/* Predict Hover */
+/* Button Hover */
 .stButton > button:hover {
     transform: scale(1.03);
     box-shadow: 0px 0px 18px rgba(0,255,200,0.5);
@@ -115,20 +115,6 @@ li:hover {
     background-color: #00FFD1 !important;
     color: black !important;
     transform: scale(1.02);
-}
-
-/* Success Box */
-.stSuccess {
-    background-color: #16213E !important;
-    color: white !important;
-    border-radius: 10px;
-}
-
-/* Info Box */
-.stInfo {
-    background-color: #0F3460 !important;
-    color: white !important;
-    border-radius: 10px;
 }
 
 /* Progress Bar */
@@ -152,7 +138,7 @@ st.title("🎓 Student Score Predictor")
 st.write("Fill student details to predict exam performance.")
 
 # =========================
-# INPUT FIELDS
+# INPUTS
 # =========================
 hours = st.number_input("Hours Studied", min_value=0.0, max_value=24.0)
 attendance = st.number_input("Attendance (%)", min_value=0.0, max_value=100.0)
@@ -196,28 +182,21 @@ if st.button("Predict Score"):
     # Convert to DataFrame
     input_df = pd.DataFrame([data])
 
-    # One-Hot Encoding
+    # One Hot Encoding
     input_df = pd.get_dummies(input_df)
 
-    # Match Training Columns
+    # Match Model Columns
     input_df = input_df.reindex(columns=columns, fill_value=0)
 
-    # Prediction
+    # Predict
     prediction = model.predict(input_df)[0]
 
-    # Score Range
+    # Score Limit
     final_score = max(0, min(100, prediction))
     final_score = int(round(final_score))
-    # Result Card
-    st.markdown(f"""
-    <div class="result-card">
-        <div class="result-label">PREDICTED EXAM SCORE</div>
-        <div class="result-score">{final_score}<span> /100</span></div>
-    </div>
-    """, unsafe_allow_html=True)
 
     # =========================
-    # GRADE SYSTEM
+    # GRADE
     # =========================
     if final_score >= 90:
         grade = "A+"
@@ -233,54 +212,58 @@ if st.button("Predict Score"):
         grade = "F"
 
     # =========================
-# =========================
-# RESULT CARD
-# =========================
-st.markdown(f"""
-<div style="
-    background: linear-gradient(to right, #141E30, #243B55);
-    padding: 30px;
-    border-radius: 20px;
-    text-align: center;
-    box-shadow: 0px 0px 20px rgba(0,255,200,0.25);
-    margin-top: 20px;
-">
-
-    <div style="
-        color: #00FFD1;
-        font-size: 18px;
-        font-weight: bold;
-        letter-spacing: 1px;
+    # RESULT CARD
+    # =========================
+    st.markdown(f"""
+    <div class="result-card" style="
+        background: linear-gradient(to right, #141E30, #243B55);
+        padding: 30px;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0px 0px 20px rgba(0,255,200,0.25);
+        margin-top: 20px;
     ">
-        PREDICTED EXAM SCORE
+
+        <div style="
+            color: #00FFD1;
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        ">
+            PREDICTED EXAM SCORE
+        </div>
+
+        <div style="
+            color: white;
+            font-size: 55px;
+            font-weight: bold;
+            margin-top: 10px;
+        ">
+            {final_score}
+            <span style="
+                font-size: 24px;
+                color: #bbbbbb;
+            ">
+                /100
+            </span>
+        </div>
+
+        <div style="
+            margin-top: 15px;
+            font-size: 22px;
+            color: #92FE9D;
+            font-weight: bold;
+        ">
+            📘 Predicted Grade : {grade}
+        </div>
+
     </div>
+    """, unsafe_allow_html=True)
 
-    <div style="
-        color: white;
-        font-size: 55px;
-        font-weight: bold;
-        margin-top: 10px;
-    ">
-        {final_score}
-        <span style="font-size: 24px; color: #bbbbbb;">/100</span>
-    </div>
-
-    <div style="
-        margin-top: 15px;
-        font-size: 22px;
-        color: #92FE9D;
-        font-weight: bold;
-    ">
-        📘 Predicted Grade : {grade}
-    </div>
-
-</div>
-""", unsafe_allow_html=True)
-
-# =========================
-# PROGRESS BAR
-# =========================
-st.progress(final_score / 100)
+    # =========================
+    # PROGRESS BAR
+    # =========================
+    st.progress(final_score / 100)
 
     # =========================
     # DONUT CHART
