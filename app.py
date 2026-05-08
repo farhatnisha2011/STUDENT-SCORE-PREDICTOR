@@ -180,12 +180,12 @@ if st.button("Predict Score"):
 
 ## Install Required Libraries
 
-```bash
+
 pip install streamlit pandas joblib matplotlib
-```
+
 
 ## Run Streamlit App
 
-```bash
+
 streamlit run app.py
-```
+
