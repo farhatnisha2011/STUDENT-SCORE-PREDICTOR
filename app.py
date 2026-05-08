@@ -176,7 +176,7 @@ if st.button("Predict Score"):
     # CELEBRATION
     # =========================
     st.balloons()
-```
+
 
 ## Install Required Libraries
 
