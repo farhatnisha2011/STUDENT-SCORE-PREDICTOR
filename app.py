@@ -176,7 +176,60 @@ if st.button("Predict Score"):
     # CELEBRATION
     # =========================
     st.balloons()
+# =========================
+# CUSTOM CSS
+# =========================
+st.markdown("""
+<style>
 
+/* Main Background */
+.stApp {
+    background: linear-gradient(to right, #dfe9f3, #ffffff);
+}
+
+/* Title */
+h1 {
+    color: #2E4053;
+    text-align: center;
+}
+
+/* Button Style */
+.stButton > button {
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 12px;
+    height: 3em;
+    width: 100%;
+    font-size: 18px;
+    border: none;
+    transition: 0.3s ease;
+}
+
+/* Hover Effect */
+.stButton > button:hover {
+    background-color: #2E8B57;
+    transform: scale(1.03);
+    box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+}
+
+/* Input Box Styling */
+.stNumberInput input,
+.stSelectbox div[data-baseweb="select"] {
+    border-radius: 10px;
+}
+
+/* Success Box */
+.stSuccess {
+    border-radius: 10px;
+}
+
+/* Info Box */
+.stInfo {
+    border-radius: 10px;
+}
+
+</style>
+""", unsafe_allow_html=True)
 
 
 
