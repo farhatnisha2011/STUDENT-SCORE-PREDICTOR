@@ -1,10 +1,10 @@
 # Enhanced Student Score Predictor (All Features Added)
 
-
+```python
 import streamlit as st
 import joblib
 import pandas as pd
-
+import matplotlib.pyplot as plt
 
 # =========================
 # PAGE CONFIG
@@ -134,7 +134,7 @@ if st.button("Predict Score"):
     # =========================
     # DONUT CHART
     # =========================
- 
+    fig, ax = plt.subplots()
 
     values = [final_score, 100 - final_score]
     labels = ["Score", "Remaining"]
@@ -176,16 +176,16 @@ if st.button("Predict Score"):
     # CELEBRATION
     # =========================
     st.balloons()
-
+```
 
 ## Install Required Libraries
 
-
-
-
+```bash
+pip install streamlit pandas joblib matplotlib
+```
 
 ## Run Streamlit App
 
-
-
-
+```bash
+streamlit run app.py
+```
