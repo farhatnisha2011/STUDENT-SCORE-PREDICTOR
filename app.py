@@ -178,14 +178,5 @@ if st.button("Predict Score"):
     st.balloons()
 
 
-## Install Required Libraries
 
-
-
-
-
-## Run Streamlit App
-
-
-streamlit run app.py
 
