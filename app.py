@@ -208,6 +208,13 @@ if st.button("Predict Score"):
     # Score Range
     final_score = max(0, min(100, prediction))
     final_score = int(round(final_score))
+    # Result Card
+    st.markdown(f"""
+    <div class="result-card">
+        <div class="result-label">PREDICTED EXAM SCORE</div>
+        <div class="result-score">{final_score}<span> /100</span></div>
+    </div>
+    """, unsafe_allow_html=True)
 
     # =========================
     # GRADE SYSTEM
