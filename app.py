@@ -177,59 +177,85 @@ if st.button("Predict Score"):
     # =========================
     st.balloons()
 # =========================
-# CUSTOM CSS
+# DARK THEME CSS
 # =========================
 st.markdown("""
 <style>
 
-/* Main Background */
+/* Full App Background */
 .stApp {
-    background: linear-gradient(to right, #dfe9f3, #ffffff);
-}
-
-/* Title */
-h1 {
-    color: #2E4053;
-    text-align: center;
-}
-
-/* Button Style */
-.stButton > button {
-    background-color: #4CAF50;
+    background: linear-gradient(to right, #141E30, #243B55);
     color: white;
+}
+
+/* Main Title */
+h1 {
+    color: #00FFD1;
+    text-align: center;
+    font-size: 42px;
+}
+
+/* Text */
+p, label, div {
+    color: white !important;
+}
+
+/* Input Fields */
+.stNumberInput input {
+    background-color: #1E1E1E;
+    color: white;
+    border-radius: 10px;
+    border: 1px solid #444;
+}
+
+/* Selectbox */
+div[data-baseweb="select"] {
+    background-color: #1E1E1E !important;
+    border-radius: 10px;
+    color: white !important;
+}
+
+/* Predict Button */
+.stButton > button {
+    background: linear-gradient(to right, #00C9FF, #92FE9D);
+    color: black;
+    border: none;
     border-radius: 12px;
-    height: 3em;
+    height: 3.2em;
     width: 100%;
     font-size: 18px;
-    border: none;
+    font-weight: bold;
     transition: 0.3s ease;
 }
 
 /* Hover Effect */
 .stButton > button:hover {
-    background-color: #2E8B57;
-    transform: scale(1.03);
-    box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+    transform: scale(1.04);
+    box-shadow: 0px 0px 20px rgba(0,255,200,0.5);
 }
 
-/* Input Box Styling */
-.stNumberInput input,
-.stSelectbox div[data-baseweb="select"] {
-    border-radius: 10px;
-}
-
-/* Success Box */
+/* Success Message */
 .stSuccess {
+    background-color: #16213E;
+    color: white;
     border-radius: 10px;
+    padding: 10px;
 }
 
-/* Info Box */
+/* Info Message */
 .stInfo {
+    background-color: #0F3460;
+    color: white;
     border-radius: 10px;
+    padding: 10px;
+}
+
+/* Progress Bar */
+.stProgress > div > div > div > div {
+    background-color: #00FFD1;
 }
 
 </style>
 """, unsafe_allow_html=True)
-
 
 
