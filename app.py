@@ -189,7 +189,7 @@ st.markdown("""
 
 /* All Text Color */
 html, body, [class*="css"]  {
-    color: white;
+    color: black;
 }
 
 /* Title */
