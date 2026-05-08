@@ -186,6 +186,6 @@ if st.button("Predict Score"):
 
 ## Run Streamlit App
 
-```bash
+
 streamlit run app.py
 ```
