@@ -181,7 +181,7 @@ if st.button("Predict Score"):
 ## Install Required Libraries
 
 
-pip install streamlit pandas joblib matplotlib
+
 ```
 
 ## Run Streamlit App
