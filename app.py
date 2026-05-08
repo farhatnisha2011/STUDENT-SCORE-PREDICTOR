@@ -1,6 +1,6 @@
 # Enhanced Student Score Predictor (All Features Added)
 
-```python
+
 import streamlit as st
 import joblib
 import pandas as pd
