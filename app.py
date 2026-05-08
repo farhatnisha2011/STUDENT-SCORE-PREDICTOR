@@ -201,19 +201,19 @@ h1 {
 
 /* Labels */
 label {
-    color: white !important;
+    color: black !important;
     font-weight: bold;
 }
 
 /* Paragraph Text */
 p {
-    color: white !important;
+    color: black !important;
 }
 
 /* Input Boxes */
 .stNumberInput input {
     background-color: #1E1E1E !important;
-    color: white !important;
+    color: black !important;
     border-radius: 10px;
     border: 1px solid #555;
 }
@@ -222,7 +222,7 @@ p {
 div[data-baseweb="select"] {
     background-color: #1E1E1E !important;
     border-radius: 10px;
-    color: white !important;
+    color: black !important;
 }
 
 /* Dropdown Text */
