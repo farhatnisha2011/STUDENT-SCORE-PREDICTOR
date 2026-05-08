@@ -58,7 +58,7 @@ p {
 div[data-baseweb="select"] {
     background-color: #1E1E1E !important;
     border-radius: 10px;
-    color: white !important;
+    color: black !important;
 }
 
 /* Selected Text */
@@ -69,12 +69,12 @@ div[data-baseweb="select"] span {
 /* Dropdown Menu */
 ul {
     background-color: #1E1E1E !important;
-    color: white !important;
+    color: black !important;
 }
 
 /* Dropdown Options */
 li {
-    color: white !important;
+    color: black !important;
 }
 
 /* Dropdown Hover */
