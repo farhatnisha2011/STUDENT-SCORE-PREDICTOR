@@ -233,15 +233,54 @@ if st.button("Predict Score"):
         grade = "F"
 
     # =========================
-    # OUTPUT
-    # =========================
-    st.success(f"🎯 Predicted Exam Score: {final_score}")
-    st.info(f"📘 Predicted Grade: {grade}")
+# =========================
+# RESULT CARD
+# =========================
+st.markdown(f"""
+<div style="
+    background: linear-gradient(to right, #141E30, #243B55);
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0px 0px 20px rgba(0,255,200,0.25);
+    margin-top: 20px;
+">
 
-    # =========================
-    # PROGRESS BAR
-    # =========================
-    st.progress(final_score / 100)
+    <div style="
+        color: #00FFD1;
+        font-size: 18px;
+        font-weight: bold;
+        letter-spacing: 1px;
+    ">
+        PREDICTED EXAM SCORE
+    </div>
+
+    <div style="
+        color: white;
+        font-size: 55px;
+        font-weight: bold;
+        margin-top: 10px;
+    ">
+        {final_score}
+        <span style="font-size: 24px; color: #bbbbbb;">/100</span>
+    </div>
+
+    <div style="
+        margin-top: 15px;
+        font-size: 22px;
+        color: #92FE9D;
+        font-weight: bold;
+    ">
+        📘 Predicted Grade : {grade}
+    </div>
+
+</div>
+""", unsafe_allow_html=True)
+
+# =========================
+# PROGRESS BAR
+# =========================
+st.progress(final_score / 100)
 
     # =========================
     # DONUT CHART
