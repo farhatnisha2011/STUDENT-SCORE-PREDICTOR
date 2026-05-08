@@ -214,47 +214,49 @@ if st.button("Predict Score"):
     # =========================
     # RESULT CARD
     # =========================
-    st.markdown(f"""
-    <div style="
+    result_html = f"""
+    <div style='
         background: linear-gradient(to right, #141E30, #243B55);
         padding: 30px;
         border-radius: 20px;
         text-align: center;
         box-shadow: 0px 0px 20px rgba(0,255,200,0.25);
         margin-top: 20px;
-    ">
+    '>
 
-        <h3 style="
+        <h3 style='
             color: #00FFD1;
             margin-bottom: 10px;
             letter-spacing: 1px;
-        ">
+        '>
             PREDICTED EXAM SCORE
         </h3>
 
-        <h1 style="
+        <h1 style='
             color: white;
             font-size: 60px;
             margin: 0;
-        ">
+        '>
             {final_score}
-            <span style="
+            <span style='
                 font-size: 24px;
                 color: #bbbbbb;
-            ">
+            '>
                 /100
             </span>
         </h1>
 
-        <h3 style="
+        <h3 style='
             color: #92FE9D;
             margin-top: 15px;
-        ">
+        '>
             📘 Predicted Grade : {grade}
         </h3>
 
     </div>
-    """, unsafe_allow_html=True)
+    """
+
+    st.markdown(result_html, unsafe_allow_html=True)
 
     # =========================
     # PROGRESS BAR
