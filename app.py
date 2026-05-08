@@ -13,19 +13,19 @@ st.set_page_config(
 )
 
 # =========================
-# DARK THEME CSS
+# PREMIUM DARK CSS
 # =========================
 st.markdown("""
 <style>
 
-/* Full App Background */
+/* App Background */
 .stApp {
-    background: linear-gradient(to right, #141E30, #243B55);
+    background: linear-gradient(to right, #0F2027, #203A43, #2C5364);
 }
 
 /* Global Text */
 html, body, [class*="css"] {
-    color: white;
+    color: white !important;
 }
 
 /* Title */
@@ -33,32 +33,29 @@ h1 {
     color: #00FFD1 !important;
     text-align: center;
     font-size: 42px;
+    font-weight: bold;
 }
 
 /* Labels */
 label {
     color: white !important;
-    font-weight: bold;
+    font-weight: 600;
 }
 
-/* Paragraphs */
-p {
-    color: white !important;
-}
-
-/* Number Input */
+/* Number Inputs */
 .stNumberInput input {
-    background-color: #1E1E1E !important;
+    background-color: #111111 !important;
     color: white !important;
     border-radius: 10px;
     border: 1px solid #555;
 }
 
-/* Selectbox */
-div[data-baseweb="select"] {
-    background-color: #1E1E1E !important;
-    border-radius: 10px;
-    color: black !important;
+/* Selectbox Main */
+div[data-baseweb="select"] > div {
+    background-color: #111111 !important;
+    color: white !important;
+    border-radius: 10px !important;
+    border: 1px solid #555 !important;
 }
 
 /* Selected Text */
@@ -68,24 +65,26 @@ div[data-baseweb="select"] span {
 
 /* Dropdown Menu */
 ul {
-    background-color: #1E1E1E !important;
-    color: black !important;
+    background-color: #111111 !important;
+    border-radius: 10px !important;
 }
 
 /* Dropdown Options */
 li {
-    color: black !important;
+    background-color: #111111 !important;
+    color: white !important;
 }
 
 /* Dropdown Hover */
 li:hover {
-    background-color: #333 !important;
+    background-color: #333333 !important;
+    color: #00FFD1 !important;
 }
 
-/* Button */
+/* Predict Button */
 .stButton > button {
     background: linear-gradient(to right, #00C9FF, #92FE9D);
-    color: black;
+    color: black !important;
     border: none;
     border-radius: 12px;
     height: 3.2em;
@@ -95,10 +94,27 @@ li:hover {
     transition: 0.3s ease;
 }
 
-/* Button Hover */
+/* Predict Hover */
 .stButton > button:hover {
-    transform: scale(1.04);
-    box-shadow: 0px 0px 20px rgba(0,255,200,0.5);
+    transform: scale(1.03);
+    box-shadow: 0px 0px 18px rgba(0,255,200,0.5);
+}
+
+/* Download Button */
+.stDownloadButton > button {
+    background-color: #111111 !important;
+    color: white !important;
+    border-radius: 10px;
+    border: 1px solid #00FFD1;
+    font-weight: bold;
+    transition: 0.3s ease;
+}
+
+/* Download Hover */
+.stDownloadButton > button:hover {
+    background-color: #00FFD1 !important;
+    color: black !important;
+    transform: scale(1.02);
 }
 
 /* Success Box */
@@ -177,10 +193,10 @@ if st.button("Predict Score"):
         "Extracurricular_Activities": activities
     }
 
-    # DataFrame
+    # Convert to DataFrame
     input_df = pd.DataFrame([data])
 
-    # One Hot Encoding
+    # One-Hot Encoding
     input_df = pd.get_dummies(input_df)
 
     # Match Training Columns
@@ -189,7 +205,7 @@ if st.button("Predict Score"):
     # Prediction
     prediction = model.predict(input_df)[0]
 
-    # Score Limit
+    # Score Range
     final_score = max(0, min(100, prediction))
     final_score = int(round(final_score))
 
@@ -240,7 +256,7 @@ if st.button("Predict Score"):
     st.pyplot(fig)
 
     # =========================
-    # DOWNLOAD REPORT
+    # REPORT
     # =========================
     report = f"""
 STUDENT SCORE REPORT
@@ -254,6 +270,9 @@ Previous Score : {previous}
 Sleep Hours : {sleep}
 """
 
+    # =========================
+    # DOWNLOAD BUTTON
+    # =========================
     st.download_button(
         label="📥 Download Report",
         data=report,
