@@ -1,6 +1,3 @@
-# Enhanced Student Score Predictor (All Features Added)
-
-
 import streamlit as st
 import joblib
 import pandas as pd
@@ -16,21 +13,113 @@ st.set_page_config(
 )
 
 # =========================
-# CUSTOM CSS
+# DARK THEME CSS
 # =========================
 st.markdown("""
 <style>
-.main {
-    background-color: #f5f7fa;
+
+/* Full App Background */
+.stApp {
+    background: linear-gradient(to right, #141E30, #243B55);
 }
-.stButton>button {
-    background-color: #4CAF50;
+
+/* Global Text */
+html, body, [class*="css"] {
     color: white;
+}
+
+/* Title */
+h1 {
+    color: #00FFD1 !important;
+    text-align: center;
+    font-size: 42px;
+}
+
+/* Labels */
+label {
+    color: white !important;
+    font-weight: bold;
+}
+
+/* Paragraphs */
+p {
+    color: white !important;
+}
+
+/* Number Input */
+.stNumberInput input {
+    background-color: #1E1E1E !important;
+    color: white !important;
     border-radius: 10px;
-    height: 3em;
+    border: 1px solid #555;
+}
+
+/* Selectbox */
+div[data-baseweb="select"] {
+    background-color: #1E1E1E !important;
+    border-radius: 10px;
+    color: white !important;
+}
+
+/* Selected Text */
+div[data-baseweb="select"] span {
+    color: white !important;
+}
+
+/* Dropdown Menu */
+ul {
+    background-color: #1E1E1E !important;
+    color: white !important;
+}
+
+/* Dropdown Options */
+li {
+    color: white !important;
+}
+
+/* Dropdown Hover */
+li:hover {
+    background-color: #333 !important;
+}
+
+/* Button */
+.stButton > button {
+    background: linear-gradient(to right, #00C9FF, #92FE9D);
+    color: black;
+    border: none;
+    border-radius: 12px;
+    height: 3.2em;
     width: 100%;
     font-size: 18px;
+    font-weight: bold;
+    transition: 0.3s ease;
 }
+
+/* Button Hover */
+.stButton > button:hover {
+    transform: scale(1.04);
+    box-shadow: 0px 0px 20px rgba(0,255,200,0.5);
+}
+
+/* Success Box */
+.stSuccess {
+    background-color: #16213E !important;
+    color: white !important;
+    border-radius: 10px;
+}
+
+/* Info Box */
+.stInfo {
+    background-color: #0F3460 !important;
+    color: white !important;
+    border-radius: 10px;
+}
+
+/* Progress Bar */
+.stProgress > div > div > div > div {
+    background-color: #00FFD1;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -70,7 +159,7 @@ activities = st.selectbox("Extracurricular Activities", ["Yes", "No"])
 # =========================
 if st.button("Predict Score"):
 
-    # Input data
+    # Input Data
     data = {
         "Hours_Studied": hours,
         "Attendance": attendance,
@@ -88,19 +177,19 @@ if st.button("Predict Score"):
         "Extracurricular_Activities": activities
     }
 
-    # Convert to DataFrame
+    # DataFrame
     input_df = pd.DataFrame([data])
 
-    # One-hot encoding
+    # One Hot Encoding
     input_df = pd.get_dummies(input_df)
 
-    # Match model columns
+    # Match Training Columns
     input_df = input_df.reindex(columns=columns, fill_value=0)
 
-    # Predict score
+    # Prediction
     prediction = model.predict(input_df)[0]
 
-    # Keep score between 0 and 100
+    # Score Limit
     final_score = max(0, min(100, prediction))
     final_score = int(round(final_score))
 
@@ -134,7 +223,7 @@ if st.button("Predict Score"):
     # =========================
     # DONUT CHART
     # =========================
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(5, 5))
 
     values = [final_score, 100 - final_score]
     labels = ["Score", "Remaining"]
@@ -154,16 +243,16 @@ if st.button("Predict Score"):
     # DOWNLOAD REPORT
     # =========================
     report = f"""
-    STUDENT SCORE REPORT
-    -------------------------
-    Predicted Score : {final_score}
-    Predicted Grade : {grade}
+STUDENT SCORE REPORT
+-------------------------
+Predicted Score : {final_score}
+Predicted Grade : {grade}
 
-    Hours Studied : {hours}
-    Attendance : {attendance}
-    Previous Score : {previous}
-    Sleep Hours : {sleep}
-    """
+Hours Studied : {hours}
+Attendance : {attendance}
+Previous Score : {previous}
+Sleep Hours : {sleep}
+"""
 
     st.download_button(
         label="📥 Download Report",
@@ -176,37 +265,3 @@ if st.button("Predict Score"):
     # CELEBRATION
     # =========================
     st.balloons()
-st.markdown("""
-<style>
-
-/* Selectbox Box */
-div[data-baseweb="select"] {
-    background-color: #1E1E1E !important;
-    border-radius: 10px;
-    color: white !important;
-}
-
-/* Selected Value Text */
-div[data-baseweb="select"] span {
-    color: white !important;
-}
-
-/* Dropdown Options */
-ul {
-    background-color: #1E1E1E !important;
-    color: white !important;
-}
-
-/* Dropdown Item Text */
-li {
-    color: white !important;
-}
-
-/* Hover Effect */
-li:hover {
-    background-color: #333 !important;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
