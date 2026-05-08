@@ -176,99 +176,31 @@ if st.button("Predict Score"):
     # CELEBRATION
     # =========================
     st.balloons()
-# =========================
-# DARK THEME CSS FIXED
-# =========================
-st.markdown("""
-<style>
-
-/* App Background */
-.stApp {
-    background: linear-gradient(to right, #141E30, #243B55);
-}
-
-/* All Text Color */
-html, body, [class*="css"]  {
-    color: black;
-}
-
-/* Title */
-h1 {
-    color: #00FFD1 !important;
-    text-align: center;
-    font-size: 42px;
-}
-
-/* Labels */
-label {
-    color: black !important;
-    font-weight: bold;
-}
-
-/* Paragraph Text */
-p {
-    color: black !important;
-}
-
-/* Input Boxes */
-.stNumberInput input {
-    background-color: #1E1E1E !important;
-    color: black !important;
-    border-radius: 10px;
-    border: 1px solid #555;
-}
-
-/* Selectbox */
+/* Selectbox Box */
 div[data-baseweb="select"] {
     background-color: #1E1E1E !important;
     border-radius: 10px;
-    color: black !important;
-}
-
-/* Dropdown Text */
-div[data-baseweb="select"] * {
     color: white !important;
 }
 
-/* Button */
-.stButton > button {
-    background: linear-gradient(to right, #00C9FF, #92FE9D);
-    color: black;
-    border: none;
-    border-radius: 12px;
-    height: 3.2em;
-    width: 100%;
-    font-size: 18px;
-    font-weight: bold;
-    transition: 0.3s ease;
-}
-
-/* Hover Effect */
-.stButton > button:hover {
-    transform: scale(1.04);
-    box-shadow: 0px 0px 20px rgba(0,255,200,0.5);
-}
-
-/* Success Box */
-.stSuccess {
-    background-color: #16213E !important;
+/* Selected Value Text */
+div[data-baseweb="select"] span {
     color: white !important;
-    border-radius: 10px;
 }
 
-/* Info Box */
-.stInfo {
-    background-color: #0F3460 !important;
+/* Dropdown Options */
+ul {
+    background-color: #1E1E1E !important;
     color: white !important;
-    border-radius: 10px;
 }
 
-/* Progress Bar */
-.stProgress > div > div > div > div {
-    background-color: #00FFD1;
+/* Dropdown Item Text */
+li {
+    color: white !important;
 }
 
-</style>
-""", unsafe_allow_html=True)
-
+/* Hover on Dropdown */
+li:hover {
+    background-color: #333 !important;
+}
 
