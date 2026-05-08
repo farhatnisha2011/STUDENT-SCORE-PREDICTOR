@@ -134,7 +134,7 @@ if st.button("Predict Score"):
     # =========================
     # DONUT CHART
     # =========================
-    fig, ax = plt.subplots()
+ 
 
     values = [final_score, 100 - final_score]
     labels = ["Score", "Remaining"]
