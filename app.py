@@ -138,7 +138,7 @@ st.title("🎓 Student Score Predictor")
 st.write("Fill student details to predict exam performance.")
 
 # =========================
-# INPUTS
+# INPUT FIELDS
 # =========================
 hours = st.number_input("Hours Studied", min_value=0.0, max_value=24.0)
 attendance = st.number_input("Attendance (%)", min_value=0.0, max_value=100.0)
@@ -188,15 +188,15 @@ if st.button("Predict Score"):
     # Match Model Columns
     input_df = input_df.reindex(columns=columns, fill_value=0)
 
-    # Predict
+    # Prediction
     prediction = model.predict(input_df)[0]
 
-    # Score Limit
+    # Score Range
     final_score = max(0, min(100, prediction))
     final_score = int(round(final_score))
 
     # =========================
-    # GRADE
+    # GRADE SYSTEM
     # =========================
     if final_score >= 90:
         grade = "A+"
@@ -215,7 +215,7 @@ if st.button("Predict Score"):
     # RESULT CARD
     # =========================
     st.markdown(f"""
-    <div class="result-card" style="
+    <div style="
         background: linear-gradient(to right, #141E30, #243B55);
         padding: 30px;
         border-radius: 20px;
@@ -224,20 +224,18 @@ if st.button("Predict Score"):
         margin-top: 20px;
     ">
 
-        <div style="
+        <h3 style="
             color: #00FFD1;
-            font-size: 18px;
-            font-weight: bold;
+            margin-bottom: 10px;
             letter-spacing: 1px;
         ">
             PREDICTED EXAM SCORE
-        </div>
+        </h3>
 
-        <div style="
+        <h1 style="
             color: white;
-            font-size: 55px;
-            font-weight: bold;
-            margin-top: 10px;
+            font-size: 60px;
+            margin: 0;
         ">
             {final_score}
             <span style="
@@ -246,16 +244,14 @@ if st.button("Predict Score"):
             ">
                 /100
             </span>
-        </div>
+        </h1>
 
-        <div style="
-            margin-top: 15px;
-            font-size: 22px;
+        <h3 style="
             color: #92FE9D;
-            font-weight: bold;
+            margin-top: 15px;
         ">
             📘 Predicted Grade : {grade}
-        </div>
+        </h3>
 
     </div>
     """, unsafe_allow_html=True)
