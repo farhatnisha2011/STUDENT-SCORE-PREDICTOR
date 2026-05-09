@@ -17,71 +17,49 @@ st.set_page_config(
 # =========================
 st.markdown("""
 <style>
-
-/* Background */
 .stApp {
     background: linear-gradient(to right, #0F2027, #203A43, #2C5364);
 }
-
-/* Global Text */
 html, body, [class*="css"] {
     color: white !important;
 }
-
-/* Title */
 h1 {
     color: #00FFD1 !important;
     text-align: center;
     font-size: 42px;
     font-weight: bold;
 }
-
-/* Labels */
 label {
     color: white !important;
     font-weight: 600;
 }
-
-/* Number Inputs */
 .stNumberInput input {
     background-color: #111111 !important;
     color: white !important;
     border-radius: 10px;
     border: 1px solid #555;
 }
-
-/* Selectbox */
 div[data-baseweb="select"] > div {
     background-color: #111111 !important;
     color: white !important;
     border-radius: 10px !important;
     border: 1px solid #555 !important;
 }
-
-/* Selectbox Text */
 div[data-baseweb="select"] span {
     color: white !important;
 }
-
-/* Dropdown Menu */
 ul {
     background-color: #111111 !important;
     border-radius: 10px !important;
 }
-
-/* Dropdown Items */
 li {
     background-color: #111111 !important;
     color: white !important;
 }
-
-/* Dropdown Hover */
 li:hover {
     background-color: #333333 !important;
     color: #00FFD1 !important;
 }
-
-/* Predict Button */
 .stButton > button {
     background: linear-gradient(to right, #00C9FF, #92FE9D);
     color: black !important;
@@ -93,14 +71,10 @@ li:hover {
     font-weight: bold;
     transition: 0.3s ease;
 }
-
-/* Button Hover */
 .stButton > button:hover {
     transform: scale(1.03);
     box-shadow: 0px 0px 18px rgba(0,255,200,0.5);
 }
-
-/* Download Button */
 .stDownloadButton > button {
     background-color: #111111 !important;
     color: white !important;
@@ -109,19 +83,14 @@ li:hover {
     font-weight: bold;
     transition: 0.3s ease;
 }
-
-/* Download Hover */
 .stDownloadButton > button:hover {
     background-color: #00FFD1 !important;
     color: black !important;
     transform: scale(1.02);
 }
-
-/* Progress Bar */
 .stProgress > div > div > div > div {
     background-color: #00FFD1;
 }
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -132,7 +101,7 @@ try:
     model = joblib.load("student_model.pkl")
     columns = joblib.load("model_columns.pkl")
 except FileNotFoundError:
-    st.error("❌ Model files not found! Please make sure 'student_model.pkl' and 'model_columns.pkl' exist in the current directory.")
+    st.error("❌ Model files not found! Please make sure 'student_model.pkl' and 'model_columns.pkl' exist.")
     st.stop()
 
 # =========================
@@ -195,23 +164,15 @@ if st.button("🔮 Predict Score", use_container_width=True):
 
     # Convert to DataFrame
     input_df = pd.DataFrame([data])
-
-    # One Hot Encoding
     input_df = pd.get_dummies(input_df)
-
-    # Match Model Columns
     input_df = input_df.reindex(columns=columns, fill_value=0)
 
     # Prediction
     prediction = model.predict(input_df)[0]
-
-    # Score Range
     final_score = max(0, min(100, prediction))
     final_score = int(round(final_score))
 
-    # =========================
-    # GRADE SYSTEM
-    # =========================
+    # Grade System
     if final_score >= 90:
         grade = "A+"
         grade_color = "#FFD700"
@@ -238,95 +199,47 @@ if st.button("🔮 Predict Score", use_container_width=True):
         grade_message = "❌ Failing. Immediate action required!"
 
     # =========================
-    # RESULT CARD - COMPLETELY FIXED HTML
+    # FIXED RESULT CARD - NO LINE BREAKS INSIDE ATTRIBUTES
     # =========================
     result_html = f"""
-    <div style='
-        background: linear-gradient(135deg, #141E30 0%, #243B55 100%);
-        padding: 40px 30px;
-        border-radius: 25px;
-        text-align: center;
-        box-shadow: 0px 10px 30px rgba(0,255,200,0.2);
-        margin-top: 30px;
-        margin-bottom: 30px;
-        border: 1px solid rgba(0,255,209,0.3);
-    '>
-        <h3 style='color: #00FFD1; margin-bottom: 15px; letter-spacing: 2px; font-size: 20px;'>
-            📊 PREDICTED EXAM SCORE
-        </h3>
-
-        <h1 style='color: white; font-size: 70px; margin: 10px 0; font-weight: bold;'>
-            {final_score}
-            <span style='font-size: 28px; color: #bbbbbb;'>/100</span>
-        </h1>
-
+    <div style='background: linear-gradient(135deg, #141E30 0%, #243B55 100%); padding: 40px 30px; border-radius: 25px; text-align: center; box-shadow: 0px 10px 30px rgba(0,255,200,0.2); margin-top: 30px; margin-bottom: 30px; border: 1px solid rgba(0,255,209,0.3);'>
+        <h3 style='color: #00FFD1; margin-bottom: 15px; letter-spacing: 2px; font-size: 20px;'>📊 PREDICTED EXAM SCORE</h3>
+        <h1 style='color: white; font-size: 70px; margin: 10px 0; font-weight: bold;'>{final_score}<span style='font-size: 28px; color: #bbbbbb;'>/100</span></h1>
         <div style='background: {grade_color}; display: inline-block; padding: 10px 25px; border-radius: 50px; margin-top: 10px;'>
-            <h3 style='color: black; margin: 0; font-weight: bold;'>
-                📘 Predicted Grade : {grade}
-            </h3>
+            <h3 style='color: black; margin: 0; font-weight: bold;'>📘 Predicted Grade : {grade}</h3>
         </div>
-        
-        <p style='color: #cccccc; margin-top: 20px; font-size: 14px;'>
-            {grade_message}
-        </p>
+        <p style='color: #cccccc; margin-top: 20px; font-size: 14px;'>{grade_message}</p>
     </div>
     """
 
     st.markdown(result_html, unsafe_allow_html=True)
 
-    # =========================
-    # PROGRESS BAR
-    # =========================
+    # Progress Bar
     st.subheader("📈 Score Progress")
     st.progress(final_score / 100)
-    
-    # Display percentage
     st.caption(f"🎯 {final_score}% of maximum score achieved")
 
-    # =========================
-    # TWO COLUMN LAYOUT FOR CHARTS
-    # =========================
+    # Charts
     chart_col1, chart_col2 = st.columns(2)
 
     with chart_col1:
-        # DONUT CHART
         st.subheader("🍩 Score Breakdown")
         fig, ax = plt.subplots(figsize=(5, 5))
-
         values = [final_score, 100 - final_score]
         labels = ["Your Score", "Remaining"]
         colors = ["#00FFD1", "#2C5364"]
         explode = (0.05, 0)
-
-        wedges, texts, autotexts = ax.pie(
-            values,
-            labels=labels,
-            autopct='%1.1f%%',
-            colors=colors,
-            explode=explode,
-            wedgeprops=dict(width=0.4, edgecolor='white'),
-            textprops={'fontsize': 10, 'fontweight': 'bold'}
-        )
-
-        for text in texts:
-            text.set_color('white')
-        for autotext in autotexts:
-            autotext.set_color('white')
-            autotext.set_fontweight('bold')
-
+        ax.pie(values, labels=labels, autopct='%1.1f%%', colors=colors, explode=explode, wedgeprops=dict(width=0.4, edgecolor='white'), textprops={'fontsize': 10, 'fontweight': 'bold'})
         ax.set_title("Score Distribution", color='white', fontsize=12, pad=20)
         ax.axis('equal')
         st.pyplot(fig)
 
     with chart_col2:
-        # BAR CHART FOR COMPARISON
         st.subheader("📊 Performance Meter")
         fig2, ax2 = plt.subplots(figsize=(5, 5))
-        
         categories = ['Your Score', 'Class Average', 'Target Score']
         values2 = [final_score, 65, 85]
         colors2 = ['#00FFD1', '#FFA500', '#FF6B6B']
-        
         bars = ax2.bar(categories, values2, color=colors2, alpha=0.7)
         ax2.set_ylim(0, 100)
         ax2.set_ylabel('Score', color='white')
@@ -336,18 +249,12 @@ if st.button("🔮 Predict Score", use_container_width=True):
         ax2.spines['left'].set_color('white')
         ax2.spines['top'].set_visible(False)
         ax2.spines['right'].set_visible(False)
-        
-        # Add value labels on bars
         for bar, value in zip(bars, values2):
             height = bar.get_height()
-            ax2.text(bar.get_x() + bar.get_width()/2., height + 2,
-                    f'{value}', ha='center', va='bottom', color='white', fontweight='bold')
-        
+            ax2.text(bar.get_x() + bar.get_width()/2., height + 2, f'{value}', ha='center', va='bottom', color='white', fontweight='bold')
         st.pyplot(fig2)
 
-    # =========================
-    # PERFORMANCE INSIGHTS
-    # =========================
+    # Insights
     st.subheader("💡 Personalized Insights")
     
     insight_col1, insight_col2, insight_col3 = st.columns(3)
@@ -376,7 +283,7 @@ if st.button("🔮 Predict Score", use_container_width=True):
         else:
             st.warning(f"📖 Low attendance ({attendance}%) - This affects your score!")
 
-    # Additional insights based on other factors
+    # Key Factors
     st.subheader("🔍 Key Factors Affecting Your Score")
     
     factor_col1, factor_col2 = st.columns(2)
@@ -411,9 +318,7 @@ if st.button("🔮 Predict Score", use_container_width=True):
         else:
             st.warning("😴 Sleep deprivation affects academic performance")
 
-    # =========================
-    # REPORT GENERATION
-    # =========================
+    # Report
     report = f"""
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
               STUDENT SCORE PREDICTION REPORT
@@ -452,10 +357,8 @@ ENVIRONMENT FACTORS:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📈 RECOMMENDATIONS:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 """
 
-    # Add personalized recommendations
     if final_score < 60:
         report += "  ✓ Increase study hours to at least 6 hours daily\n"
     if attendance < 75:
@@ -469,22 +372,13 @@ ENVIRONMENT FACTORS:
     if parent != "High":
         report += "  ✓ Discuss your progress regularly with parents/guardians\n"
     
-    if final_score >= 75:
-        report += "\n  🌟 Keep up the excellent work! You're on the path to success!\n"
-    elif final_score >= 50:
-        report += "\n  📚 You're doing well! Focus on improving weak areas to reach the next level.\n"
-    else:
-        report += "\n  💪 Don't get discouraged! Use this report to identify areas needing improvement.\n"
-
     report += """
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          GENERATED BY STUDENT SCORE PREDICTOR
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     """
 
-    # =========================
-    # DOWNLOAD BUTTON
-    # =========================
+    # Download Button
     col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
     with col_btn2:
         st.download_button(
@@ -495,9 +389,7 @@ ENVIRONMENT FACTORS:
             use_container_width=True
         )
 
-    # =========================
-    # CELEBRATION EFFECTS
-    # =========================
+    # Celebration
     if final_score >= 80:
         st.balloons()
         st.snow()
@@ -508,8 +400,5 @@ ENVIRONMENT FACTORS:
     else:
         st.info("💪 Remember: Every expert was once a beginner. Keep working hard!")
 
-    # =========================
-    # SHARE BUTTON AREA
-    # =========================
     st.markdown("---")
     st.caption("🎓 Student Score Predictor - Helping students achieve their academic goals")
