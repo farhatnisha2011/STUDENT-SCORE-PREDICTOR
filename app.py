@@ -69,93 +69,136 @@ def logout_user():
         st.session_state.child_name = None
 
 # =========================
-# LOGIN PAGE
+# LOGIN PAGE WITH FIXED TEXT VISIBILITY
 # =========================
 def show_login_page():
+    # Force all text to be visible with high contrast
     st.markdown("""
     <style>
+    /* Force all text in login page to be visible */
+    .stApp {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
+    }
+    
+    /* Make all labels and text white */
+    label, .stTextInput label, .stSelectbox label {
+        color: white !important;
+        font-weight: bold !important;
+        font-size: 16px !important;
+    }
+    
+    /* Make input text white */
+    .stTextInput input, .stNumberInput input {
+        color: white !important;
+        background-color: #333333 !important;
+        border: 1px solid #00FFD1 !important;
+        border-radius: 8px !important;
+        padding: 10px !important;
+    }
+    
+    /* Placeholder text color */
+    .stTextInput input::placeholder {
+        color: #aaaaaa !important;
+    }
+    
+    /* Button styling */
+    .stButton button {
+        background: linear-gradient(135deg, #00C9FF, #92FE9D) !important;
+        color: black !important;
+        font-weight: bold !important;
+        border-radius: 10px !important;
+        padding: 10px !important;
+    }
+    
+    /* Main text */
+    p, div, span, h1, h2, h3, h4 {
+        color: white !important;
+    }
+    
+    /* Login container */
     .login-container {
-        max-width: 450px;
-        margin: 0 auto;
-        padding: 40px;
-        background: linear-gradient(135deg, #141E30 0%, #243B55 100%);
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        margin-top: 30px;
+        background: rgba(0,0,0,0.5) !important;
+        border-radius: 20px !important;
+        padding: 30px !important;
+        border: 1px solid #00FFD1 !important;
     }
-    .login-title {
-        text-align: center;
-        color: #00FFD1;
-        margin-bottom: 20px;
-        font-size: 28px;
-    }
-    .role-button {
-        background: linear-gradient(135deg, #00C9FF, #92FE9D);
-        color: black;
-        padding: 10px;
-        border-radius: 10px;
-        text-align: center;
-        font-weight: bold;
-        cursor: pointer;
-        margin: 5px;
+    
+    /* Role buttons */
+    .stButton button[kind="secondary"] {
+        background: #2c3e50 !important;
+        color: white !important;
     }
     </style>
     """, unsafe_allow_html=True)
     
-    # Role selection buttons
+    # Title
     st.markdown("""
-    <div style="text-align: center; margin-bottom: 20px;">
-        <h3 style="color: white; margin-bottom: 15px;">🎯 Select Your Role</h3>
-    </div>
+    <h1 style="text-align: center; color: #00FFD1; margin-bottom: 20px;">
+        🎓 Student Score Predictor
+    </h1>
+    """, unsafe_allow_html=True)
+    
+    # Role selection
+    st.markdown("""
+    <h3 style="text-align: center; color: white; margin-bottom: 20px;">
+        Select Your Role
+    </h3>
     """, unsafe_allow_html=True)
     
     col_role1, col_role2, col_role3 = st.columns(3)
     
     with col_role1:
-        if st.button("🎓 Student", use_container_width=True, key="btn_student"):
+        if st.button("🎓 Student", use_container_width=True):
             st.session_state.selected_role = "student"
             st.rerun()
     with col_role2:
-        if st.button("👨‍🏫 Teacher", use_container_width=True, key="btn_teacher"):
+        if st.button("👨‍🏫 Teacher", use_container_width=True):
             st.session_state.selected_role = "teacher"
             st.rerun()
     with col_role3:
-        if st.button("👨‍👩‍👧 Parent", use_container_width=True, key="btn_parent"):
+        if st.button("👨‍👩‍👧 Parent", use_container_width=True):
             st.session_state.selected_role = "parent"
             st.rerun()
     
     if "selected_role" not in st.session_state:
         st.session_state.selected_role = "student"
     
-    # Show selected role with colored text
+    # Show selected role
     st.markdown(f"""
-    <div style="text-align: center; margin: 15px 0;">
-        <p style="color: #00FFD1; font-size: 18px; font-weight: bold;">✓ Selected: {st.session_state.selected_role.upper()} Login</p>
+    <div style="text-align: center; margin: 20px 0;">
+        <span style="background: #00FFD1; color: black; padding: 8px 20px; border-radius: 20px; font-weight: bold;">
+            ✓ SELECTED: {st.session_state.selected_role.upper()}
+        </span>
     </div>
     """, unsafe_allow_html=True)
     
-    col1, col2, col3 = st.columns([1, 2, 1])
-    
-    with col2:
+    # Login form container
+    with st.container():
         st.markdown('<div class="login-container">', unsafe_allow_html=True)
         
-        # Role-specific title with emoji
+        # Role-specific title
         if st.session_state.selected_role == "student":
-            st.markdown('<h2 class="login-title">🎓 Student Login</h2>', unsafe_allow_html=True)
+            st.markdown('<h2 style="text-align: center; color: #00FFD1;">🎓 Student Login</h2>', unsafe_allow_html=True)
         elif st.session_state.selected_role == "teacher":
-            st.markdown('<h2 class="login-title">👨‍🏫 Teacher Login</h2>', unsafe_allow_html=True)
+            st.markdown('<h2 style="text-align: center; color: #00FFD1;">👨‍🏫 Teacher Login</h2>', unsafe_allow_html=True)
         else:
-            st.markdown('<h2 class="login-title">👨‍👩‍👧 Parent Login</h2>', unsafe_allow_html=True)
+            st.markdown('<h2 style="text-align: center; color: #00FFD1;">👨‍👩‍👧 Parent Login</h2>', unsafe_allow_html=True)
         
-        username = st.text_input("👤 Username", key="login_username", placeholder="Enter your username")
-        password = st.text_input("🔒 Password", type="password", key="login_password", placeholder="Enter your password")
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # Username and password fields
+        username = st.text_input("👤 USERNAME", placeholder="Enter your username", key="login_username")
+        password = st.text_input("🔒 PASSWORD", type="password", placeholder="Enter your password", key="login_password")
+        
+        st.markdown("<br>", unsafe_allow_html=True)
         
         col_btn1, col_btn2 = st.columns(2)
         with col_btn1:
-            login_clicked = st.button("📝 Login", use_container_width=True)
+            login_clicked = st.button("🔐 LOGIN", use_container_width=True)
         with col_btn2:
-            guest_clicked = st.button("👤 Guest Mode", use_container_width=True)
+            guest_clicked = st.button("👤 GUEST MODE", use_container_width=True)
         
+        # Login logic
         if login_clicked:
             if username and password:
                 if username in users_db and users_db[username]["password"] == password:
@@ -180,18 +223,40 @@ def show_login_page():
             st.success("✅ Logged in as Guest!")
             st.rerun()
         
-        # Demo credentials with better visibility
-        st.markdown("---")
-        st.markdown('<p style="text-align: center; color: #00FFD1; font-weight: bold;">📝 Demo Credentials</p>', unsafe_allow_html=True)
+        st.markdown("<hr>", unsafe_allow_html=True)
+        
+        # Demo credentials
+        st.markdown('<p style="text-align: center; color: #00FFD1; font-weight: bold;">📝 DEMO CREDENTIALS</p>', unsafe_allow_html=True)
         
         if st.session_state.selected_role == "student":
-            st.markdown('<p style="text-align: center; color: #cccccc;">student1 / pass123</p>', unsafe_allow_html=True)
+            st.markdown("""
+            <div style="text-align: center; background: #333; padding: 10px; border-radius: 10px; margin-top: 10px;">
+                <code style="color: #00FFD1; font-size: 16px;">student1 / pass123</code>
+            </div>
+            """, unsafe_allow_html=True)
         elif st.session_state.selected_role == "teacher":
-            st.markdown('<p style="text-align: center; color: #cccccc;">teacher1 / teach123</p>', unsafe_allow_html=True)
+            st.markdown("""
+            <div style="text-align: center; background: #333; padding: 10px; border-radius: 10px; margin-top: 10px;">
+                <code style="color: #00FFD1; font-size: 16px;">teacher1 / teach123</code>
+            </div>
+            """, unsafe_allow_html=True)
         elif st.session_state.selected_role == "parent":
-            st.markdown('<p style="text-align: center; color: #cccccc;">parent1 / parent123 (Emma\'s Parent)<br>parent2 / mom123 (Michael\'s Parent)</p>', unsafe_allow_html=True)
+            st.markdown("""
+            <div style="text-align: center; background: #333; padding: 10px; border-radius: 10px; margin-top: 10px;">
+                <code style="color: #00FFD1; font-size: 14px;">parent1 / parent123 (Emma's Parent)</code><br>
+                <code style="color: #00FFD1; font-size: 14px;">parent2 / mom123 (Michael's Parent)</code>
+            </div>
+            """, unsafe_allow_html=True)
         
         st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Register button outside container
+    st.markdown("<br>", unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        if st.button("📝 CREATE NEW ACCOUNT", use_container_width=True):
+            st.session_state.show_register = True
+            st.rerun()
 
 # =========================
 # DARK/LIGHT MODE STATE
@@ -324,7 +389,7 @@ def main_app():
         st.markdown("Fill the details below to predict exam performance.")
     
     # =========================
-    # MAIN CSS
+    # MAIN CSS FOR APP
     # =========================
     if st.session_state.theme_mode == "dark":
         theme_css = """
@@ -332,62 +397,21 @@ def main_app():
         .stApp {
             background: linear-gradient(to right, #0F2027, #203A43, #2C5364);
         }
-        html, body, [class*="css"] {
+        label {
             color: white !important;
-        }
-        h1, h2, h3, h4, h5, h6 {
-            color: white !important;
-        }
-        .stMarkdown, p, div, span {
-            color: white !important;
-        }
-        label, .stSelectbox label, .stNumberInput label {
-            color: white !important;
+            font-weight: 600;
         }
         .stNumberInput input {
             background-color: #111111 !important;
             color: white !important;
             border-radius: 10px;
-            border: 1px solid #555;
+            border: 1px solid #00FFD1;
         }
         div[data-baseweb="select"] > div {
             background-color: #111111 !important;
             color: white !important;
             border-radius: 10px !important;
-            border: 1px solid #555 !important;
-        }
-        div[data-baseweb="select"] span, div[data-baseweb="select"] div {
-            color: white !important;
-        }
-        ul, li {
-            background-color: #111111 !important;
-            color: white !important;
-        }
-        li:hover {
-            background-color: #333333 !important;
-            color: #00FFD1 !important;
-        }
-        .stButton > button {
-            background: linear-gradient(to right, #00C9FF, #92FE9D);
-            color: black !important;
-            border: none;
-            border-radius: 12px;
-            font-weight: bold;
-            transition: 0.3s ease;
-        }
-        .stButton > button:hover {
-            transform: scale(1.03);
-            box-shadow: 0px 0px 18px rgba(0,255,200,0.5);
-        }
-        .stDownloadButton > button {
-            background-color: #111111 !important;
-            color: white !important;
-            border-radius: 10px;
-            border: 1px solid #00FFD1;
-            font-weight: bold;
-        }
-        .stProgress > div > div > div > div {
-            background-color: #00FFD1;
+            border: 1px solid #00FFD1 !important;
         }
         .insight-card {
             background: rgba(255,255,255,0.15);
@@ -408,12 +432,6 @@ def main_app():
         .stApp {
             background: linear-gradient(to right, #f5f7fa, #c3cfe2);
         }
-        html, body, [class*="css"] {
-            color: #1a1a2e !important;
-        }
-        h1, h2, h3, h4, h5, h6 {
-            color: #0f3460 !important;
-        }
         label {
             color: #1a1a2e !important;
             font-weight: 600;
@@ -421,18 +439,6 @@ def main_app():
         .stNumberInput input {
             background-color: white !important;
             color: #1a1a2e !important;
-            border-radius: 10px;
-            border: 1px solid #0f3460;
-        }
-        div[data-baseweb="select"] > div {
-            background-color: white !important;
-            color: #1a1a2e !important;
-            border-radius: 10px !important;
-            border: 1px solid #0f3460 !important;
-        }
-        .stButton > button {
-            background: linear-gradient(to right, #0f3460, #16213e);
-            color: white !important;
         }
         .insight-card {
             background: rgba(15,52,96,0.1);
@@ -440,10 +446,6 @@ def main_app():
             padding: 15px;
             margin: 10px 0;
             border-left: 4px solid #0f3460;
-            color: #1a1a2e !important;
-        }
-        .insight-card strong {
-            color: #0f3460 !important;
         }
         </style>
         """
@@ -746,16 +748,23 @@ def main_app():
 # REGISTRATION PAGE
 # =========================
 def show_register_page():
+    # Force text visibility in registration page
     st.markdown("""
     <style>
-    .register-container {
-        max-width: 500px;
-        margin: 0 auto;
-        padding: 40px;
-        background: linear-gradient(135deg, #141E30 0%, #243B55 100%);
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        margin-top: 50px;
+    .stApp {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
+    }
+    label {
+        color: white !important;
+        font-weight: bold !important;
+    }
+    .stTextInput input, .stSelectbox select {
+        color: white !important;
+        background-color: #333 !important;
+        border: 1px solid #00FFD1 !important;
+    }
+    p, div, span, h1, h2, h3 {
+        color: white !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -763,8 +772,10 @@ def show_register_page():
     col1, col2, col3 = st.columns([1, 2, 1])
     
     with col2:
-        st.markdown('<div class="register-container">', unsafe_allow_html=True)
-        st.markdown('<h2 style="text-align: center; color: #00FFD1;">📝 Create Account</h2>', unsafe_allow_html=True)
+        st.markdown("""
+        <div style="background: rgba(0,0,0,0.5); padding: 30px; border-radius: 20px; border: 1px solid #00FFD1;">
+            <h2 style="text-align: center; color: #00FFD1;">📝 Create New Account</h2>
+        """, unsafe_allow_html=True)
         
         new_username = st.text_input("👤 Username", key="reg_username")
         new_password = st.text_input("🔒 Password", type="password", key="reg_password")
@@ -803,7 +814,7 @@ def show_register_page():
                     st.warning("⚠️ Please fill all fields!")
         
         with col_btn2:
-            if st.button("🔙 Back", use_container_width=True):
+            if st.button("🔙 Back to Login", use_container_width=True):
                 st.session_state.show_register = False
                 st.rerun()
         
@@ -820,10 +831,5 @@ if not check_login_status():
         show_register_page()
     else:
         show_login_page()
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            if st.button("📝 Create New Account", use_container_width=True):
-                st.session_state.show_register = True
-                st.rerun()
 else:
     main_app()
