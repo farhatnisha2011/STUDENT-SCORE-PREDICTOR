@@ -69,194 +69,186 @@ def logout_user():
         st.session_state.child_name = None
 
 # =========================
-# LOGIN PAGE WITH FIXED TEXT VISIBILITY
+# LOGIN PAGE
 # =========================
 def show_login_page():
-    # Force all text to be visible with high contrast
+    # Clear any existing session
+    if "selected_role" not in st.session_state:
+        st.session_state.selected_role = "student"
+    
     st.markdown("""
     <style>
-    /* Force all text in login page to be visible */
+    /* Full page background */
     .stApp {
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
+        background: linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%) !important;
     }
     
-    /* Make all labels and text white */
-    label, .stTextInput label, .stSelectbox label {
+    /* All text white */
+    .stMarkdown, p, div, span, label, h1, h2, h3, h4 {
         color: white !important;
-        font-weight: bold !important;
-        font-size: 16px !important;
     }
     
-    /* Make input text white */
-    .stTextInput input, .stNumberInput input {
+    /* Input fields */
+    .stTextInput input {
+        background-color: #1a1a2e !important;
         color: white !important;
-        background-color: #333333 !important;
         border: 1px solid #00FFD1 !important;
         border-radius: 8px !important;
         padding: 10px !important;
     }
     
-    /* Placeholder text color */
+    /* Placeholder */
     .stTextInput input::placeholder {
-        color: #aaaaaa !important;
+        color: #888 !important;
     }
     
-    /* Button styling */
+    /* Buttons */
     .stButton button {
         background: linear-gradient(135deg, #00C9FF, #92FE9D) !important;
         color: black !important;
         font-weight: bold !important;
         border-radius: 10px !important;
         padding: 10px !important;
+        border: none !important;
     }
     
-    /* Main text */
-    p, div, span, h1, h2, h3, h4 {
-        color: white !important;
-    }
-    
-    /* Login container */
-    .login-container {
-        background: rgba(0,0,0,0.5) !important;
-        border-radius: 20px !important;
-        padding: 30px !important;
-        border: 1px solid #00FFD1 !important;
-    }
-    
-    /* Role buttons */
-    .stButton button[kind="secondary"] {
+    /* Role buttons specific */
+    div[data-testid="column"] .stButton button {
         background: #2c3e50 !important;
         color: white !important;
+    }
+    
+    /* Success/Error messages */
+    .stAlert {
+        background-color: #1a1a2e !important;
+        border-left-color: #00FFD1 !important;
     }
     </style>
     """, unsafe_allow_html=True)
     
     # Title
-    st.markdown("""
-    <h1 style="text-align: center; color: #00FFD1; margin-bottom: 20px;">
-        🎓 Student Score Predictor
-    </h1>
-    """, unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; color: #00FFD1;'>🎓 Student Score Predictor</h1>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
     
     # Role selection
-    st.markdown("""
-    <h3 style="text-align: center; color: white; margin-bottom: 20px;">
-        Select Your Role
-    </h3>
-    """, unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center;'>Select Your Role</h3>", unsafe_allow_html=True)
     
-    col_role1, col_role2, col_role3 = st.columns(3)
+    col1, col2, col3 = st.columns(3)
     
-    with col_role1:
-        if st.button("🎓 Student", use_container_width=True):
+    with col1:
+        if st.button("🎓 Student", key="role_student", use_container_width=True):
             st.session_state.selected_role = "student"
             st.rerun()
-    with col_role2:
-        if st.button("👨‍🏫 Teacher", use_container_width=True):
+    
+    with col2:
+        if st.button("👨‍🏫 Teacher", key="role_teacher", use_container_width=True):
             st.session_state.selected_role = "teacher"
             st.rerun()
-    with col_role3:
-        if st.button("👨‍👩‍👧 Parent", use_container_width=True):
+    
+    with col3:
+        if st.button("👨‍👩‍👧 Parent", key="role_parent", use_container_width=True):
             st.session_state.selected_role = "parent"
             st.rerun()
-    
-    if "selected_role" not in st.session_state:
-        st.session_state.selected_role = "student"
     
     # Show selected role
     st.markdown(f"""
     <div style="text-align: center; margin: 20px 0;">
-        <span style="background: #00FFD1; color: black; padding: 8px 20px; border-radius: 20px; font-weight: bold;">
+        <span style="background: #00FFD1; color: black; padding: 8px 25px; border-radius: 20px; font-weight: bold;">
             ✓ SELECTED: {st.session_state.selected_role.upper()}
         </span>
     </div>
     """, unsafe_allow_html=True)
     
-    # Login form container
+    # Login Form
     with st.container():
-        st.markdown('<div class="login-container">', unsafe_allow_html=True)
+        st.markdown("""
+        <div style="background: rgba(0,0,0,0.3); border-radius: 20px; padding: 30px; max-width: 450px; margin: 0 auto; border: 1px solid #00FFD1;">
+        """, unsafe_allow_html=True)
         
-        # Role-specific title
+        # Role specific title
         if st.session_state.selected_role == "student":
-            st.markdown('<h2 style="text-align: center; color: #00FFD1;">🎓 Student Login</h2>', unsafe_allow_html=True)
+            st.markdown("<h2 style='text-align: center; color: #00FFD1;'>🎓 Student Login</h2>", unsafe_allow_html=True)
         elif st.session_state.selected_role == "teacher":
-            st.markdown('<h2 style="text-align: center; color: #00FFD1;">👨‍🏫 Teacher Login</h2>', unsafe_allow_html=True)
+            st.markdown("<h2 style='text-align: center; color: #00FFD1;'>👨‍🏫 Teacher Login</h2>", unsafe_allow_html=True)
         else:
-            st.markdown('<h2 style="text-align: center; color: #00FFD1;">👨‍👩‍👧 Parent Login</h2>', unsafe_allow_html=True)
+            st.markdown("<h2 style='text-align: center; color: #00FFD1;'>👨‍👩‍👧 Parent Login</h2>", unsafe_allow_html=True)
         
         st.markdown("<br>", unsafe_allow_html=True)
         
-        # Username and password fields
-        username = st.text_input("👤 USERNAME", placeholder="Enter your username", key="login_username")
-        password = st.text_input("🔒 PASSWORD", type="password", placeholder="Enter your password", key="login_password")
+        # Login fields
+        username = st.text_input("Username", placeholder="Enter your username", key="login_username")
+        password = st.text_input("Password", type="password", placeholder="Enter your password", key="login_password")
         
         st.markdown("<br>", unsafe_allow_html=True)
         
+        # Login button
         col_btn1, col_btn2 = st.columns(2)
         with col_btn1:
-            login_clicked = st.button("🔐 LOGIN", use_container_width=True)
-        with col_btn2:
-            guest_clicked = st.button("👤 GUEST MODE", use_container_width=True)
-        
-        # Login logic
-        if login_clicked:
-            if username and password:
-                if username in users_db and users_db[username]["password"] == password:
-                    if users_db[username]["role"] == st.session_state.selected_role:
-                        login_user(username, users_db[username])
-                        st.success(f"✅ Welcome {users_db[username]['name']}!")
-                        st.rerun()
+            if st.button("🔐 LOGIN", use_container_width=True, key="login_btn"):
+                if username and password:
+                    # Check if user exists
+                    if username in users_db:
+                        # Check password
+                        if users_db[username]["password"] == password:
+                            # Check role match
+                            if users_db[username]["role"] == st.session_state.selected_role:
+                                login_user(username, users_db[username])
+                                st.success(f"✅ Welcome {users_db[username]['name']}!")
+                                st.rerun()
+                            else:
+                                st.error(f"❌ This account is for {users_db[username]['role']} only! Please select {users_db[username]['role']} role.")
+                        else:
+                            st.error("❌ Incorrect password!")
                     else:
-                        st.error(f"❌ This account is for {users_db[username]['role']} only!")
+                        st.error("❌ Username not found!")
                 else:
-                    st.error("❌ Invalid username or password!")
-            else:
-                st.warning("⚠️ Please enter both username and password!")
+                    st.warning("⚠️ Please enter username and password!")
         
-        if guest_clicked:
-            st.session_state.logged_in = True
-            st.session_state.username = "guest"
-            st.session_state.user_name = "Guest User"
-            st.session_state.user_role = "guest"
-            st.session_state.user_email = "guest@temp.com"
-            st.session_state.login_time = datetime.now()
-            st.success("✅ Logged in as Guest!")
-            st.rerun()
+        with col_btn2:
+            if st.button("👤 GUEST MODE", use_container_width=True, key="guest_btn"):
+                st.session_state.logged_in = True
+                st.session_state.username = "guest"
+                st.session_state.user_name = "Guest User"
+                st.session_state.user_role = "guest"
+                st.session_state.user_email = "guest@temp.com"
+                st.session_state.login_time = datetime.now()
+                st.success("✅ Logged in as Guest!")
+                st.rerun()
         
         st.markdown("<hr>", unsafe_allow_html=True)
         
         # Demo credentials
-        st.markdown('<p style="text-align: center; color: #00FFD1; font-weight: bold;">📝 DEMO CREDENTIALS</p>', unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center; font-weight: bold; color: #00FFD1;'>📝 Demo Credentials</p>", unsafe_allow_html=True)
         
         if st.session_state.selected_role == "student":
             st.markdown("""
-            <div style="text-align: center; background: #333; padding: 10px; border-radius: 10px; margin-top: 10px;">
-                <code style="color: #00FFD1; font-size: 16px;">student1 / pass123</code>
+            <div style="background: #1a1a2e; padding: 10px; border-radius: 10px; text-align: center;">
+                <code style="color: #00FFD1; font-size: 16px;">Username: student1</code><br>
+                <code style="color: #00FFD1; font-size: 16px;">Password: pass123</code>
             </div>
             """, unsafe_allow_html=True)
         elif st.session_state.selected_role == "teacher":
             st.markdown("""
-            <div style="text-align: center; background: #333; padding: 10px; border-radius: 10px; margin-top: 10px;">
-                <code style="color: #00FFD1; font-size: 16px;">teacher1 / teach123</code>
+            <div style="background: #1a1a2e; padding: 10px; border-radius: 10px; text-align: center;">
+                <code style="color: #00FFD1; font-size: 16px;">Username: teacher1</code><br>
+                <code style="color: #00FFD1; font-size: 16px;">Password: teach123</code>
             </div>
             """, unsafe_allow_html=True)
         elif st.session_state.selected_role == "parent":
             st.markdown("""
-            <div style="text-align: center; background: #333; padding: 10px; border-radius: 10px; margin-top: 10px;">
-                <code style="color: #00FFD1; font-size: 14px;">parent1 / parent123 (Emma's Parent)</code><br>
-                <code style="color: #00FFD1; font-size: 14px;">parent2 / mom123 (Michael's Parent)</code>
+            <div style="background: #1a1a2e; padding: 10px; border-radius: 10px; text-align: center;">
+                <code style="color: #00FFD1; font-size: 14px;">Username: parent1 | Password: parent123</code><br>
+                <code style="color: #00FFD1; font-size: 14px;">Username: parent2 | Password: mom123</code>
             </div>
             """, unsafe_allow_html=True)
         
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
     
-    # Register button outside container
+    # Create Account button
     st.markdown("<br>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        if st.button("📝 CREATE NEW ACCOUNT", use_container_width=True):
-            st.session_state.show_register = True
-            st.rerun()
+    if st.button("📝 CREATE NEW ACCOUNT", use_container_width=True):
+        st.session_state.show_register = True
+        st.rerun()
 
 # =========================
 # DARK/LIGHT MODE STATE
@@ -269,63 +261,28 @@ if "theme_mode" not in st.session_state:
 # =========================
 def main_app():
     
-    # =========================
-    # SIDEBAR STYLING
-    # =========================
-    if st.session_state.theme_mode == "dark":
-        sidebar_css = """
-        <style>
-        [data-testid="stSidebar"] {
-            background: linear-gradient(180deg, #0F2027 0%, #203A43 100%);
-        }
-        [data-testid="stSidebar"] .stMarkdown, 
-        [data-testid="stSidebar"] p, 
-        [data-testid="stSidebar"] div,
-        [data-testid="stSidebar"] span,
-        [data-testid="stSidebar"] h1,
-        [data-testid="stSidebar"] h2,
-        [data-testid="stSidebar"] h3,
-        [data-testid="stSidebar"] h4,
-        [data-testid="stSidebar"] label {
-            color: #ffffff !important;
-        }
-        [data-testid="stSidebar"] .stButton > button {
-            background: linear-gradient(to right, #00C9FF, #92FE9D);
-            color: black !important;
-        }
-        [data-testid="stSidebar"] hr {
-            border-color: #00FFD1 !important;
-        }
-        </style>
-        """
-    else:
-        sidebar_css = """
-        <style>
-        [data-testid="stSidebar"] {
-            background: linear-gradient(180deg, #ffffff 0%, #f0f2f6 100%);
-        }
-        [data-testid="stSidebar"] .stMarkdown, 
-        [data-testid="stSidebar"] p, 
-        [data-testid="stSidebar"] div,
-        [data-testid="stSidebar"] span,
-        [data-testid="stSidebar"] h1,
-        [data-testid="stSidebar"] h2,
-        [data-testid="stSidebar"] h3,
-        [data-testid="stSidebar"] h4,
-        [data-testid="stSidebar"] label {
-            color: #1a1a2e !important;
-        }
-        [data-testid="stSidebar"] .stButton > button {
-            background: linear-gradient(to right, #0f3460, #16213e);
-            color: white !important;
-        }
-        </style>
-        """
+    # Sidebar styling
+    sidebar_css = """
+    <style>
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #0F2027 0%, #203A43 100%);
+    }
+    [data-testid="stSidebar"] .stMarkdown, 
+    [data-testid="stSidebar"] p, 
+    [data-testid="stSidebar"] div,
+    [data-testid="stSidebar"] span,
+    [data-testid="stSidebar"] label {
+        color: #ffffff !important;
+    }
+    [data-testid="stSidebar"] .stButton button {
+        background: linear-gradient(to right, #00C9FF, #92FE9D);
+        color: black !important;
+    }
+    </style>
+    """
     st.markdown(sidebar_css, unsafe_allow_html=True)
     
-    # =========================
-    # SIDEBAR CONTENT
-    # =========================
+    # Sidebar content
     with st.sidebar:
         st.markdown("---")
         st.markdown(f"### 👤 User Profile")
@@ -353,23 +310,12 @@ def main_app():
         - Download reports
         """)
         
-        if st.session_state.user_role == "parent":
-            st.markdown("---")
-            st.markdown("### 👨‍👩‍👧 Parent Corner")
-            st.markdown("""
-            - Monitor progress
-            - Get parenting tips
-            - Track improvement
-            """)
-        
         st.markdown("---")
         st.markdown("### 📞 Support")
         st.markdown("Email: support@scorepredictor.com")
     
-    # =========================
-    # THEME TOGGLE BUTTONS
-    # =========================
-    col_theme1, col_theme2, col_theme3 = st.columns([1, 1, 3])
+    # Theme toggle
+    col_theme1, col_theme2 = st.columns(2)
     with col_theme1:
         if st.button("🌙 Dark Mode", use_container_width=True):
             st.session_state.theme_mode = "dark"
@@ -388,30 +334,24 @@ def main_app():
         st.markdown(f"### 👋 Welcome, {st.session_state.user_name}!")
         st.markdown("Fill the details below to predict exam performance.")
     
-    # =========================
-    # MAIN CSS FOR APP
-    # =========================
+    # Main CSS
     if st.session_state.theme_mode == "dark":
-        theme_css = """
+        main_css = """
         <style>
         .stApp {
             background: linear-gradient(to right, #0F2027, #203A43, #2C5364);
         }
         label {
             color: white !important;
-            font-weight: 600;
         }
         .stNumberInput input {
             background-color: #111111 !important;
             color: white !important;
-            border-radius: 10px;
             border: 1px solid #00FFD1;
         }
         div[data-baseweb="select"] > div {
             background-color: #111111 !important;
             color: white !important;
-            border-radius: 10px !important;
-            border: 1px solid #00FFD1 !important;
         }
         .insight-card {
             background: rgba(255,255,255,0.15);
@@ -419,26 +359,14 @@ def main_app():
             padding: 15px;
             margin: 10px 0;
             border-left: 4px solid #00FFD1;
-            color: white !important;
-        }
-        .insight-card strong {
-            color: #00FFD1 !important;
         }
         </style>
         """
     else:
-        theme_css = """
+        main_css = """
         <style>
         .stApp {
             background: linear-gradient(to right, #f5f7fa, #c3cfe2);
-        }
-        label {
-            color: #1a1a2e !important;
-            font-weight: 600;
-        }
-        .stNumberInput input {
-            background-color: white !important;
-            color: #1a1a2e !important;
         }
         .insight-card {
             background: rgba(15,52,96,0.1);
@@ -449,22 +377,17 @@ def main_app():
         }
         </style>
         """
+    st.markdown(main_css, unsafe_allow_html=True)
     
-    st.markdown(theme_css, unsafe_allow_html=True)
-    
-    # =========================
-    # LOAD MODEL
-    # =========================
+    # Load model
     try:
         model = joblib.load("student_model.pkl")
         columns = joblib.load("model_columns.pkl")
     except FileNotFoundError:
-        st.error("❌ Model files not found!")
+        st.error("❌ Model files not found! Please make sure 'student_model.pkl' and 'model_columns.pkl' exist.")
         st.stop()
     
-    # =========================
-    # INPUT FIELDS
-    # =========================
+    # Input fields
     col1, col2 = st.columns(2)
     
     with col1:
@@ -491,9 +414,7 @@ def main_app():
         resources = st.selectbox("📚 Learning Resources", ["Low", "Medium", "High"])
         activities = st.selectbox("⚽ Extracurricular Activities", ["Yes", "No"])
     
-    # =========================
-    # PREDICT BUTTON
-    # =========================
+    # Predict button
     if st.button("🔮 Predict Score", use_container_width=True):
         
         data = {
@@ -547,20 +468,19 @@ def main_app():
             grade_color = "#FF6B6B"
             grade_message = "❌ Failing. Immediate action required!"
         
-        # Result Card
+        # Result
         result_html = f"""
-        <div style='background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 40px 30px; border-radius: 25px; text-align: center; box-shadow: 0px 10px 30px rgba(0,200,255,0.2); margin-top: 30px; margin-bottom: 30px; border: 1px solid #00FFD1;'>
-            <h3 style='color: #00FFD1; margin-bottom: 15px; letter-spacing: 2px; font-size: 20px;'>📊 PREDICTED EXAM SCORE</h3>
-            <h1 style='color: white; font-size: 70px; margin: 10px 0; font-weight: bold;'>{final_score}<span style='font-size: 28px; color: #bbbbbb;'>/100</span></h1>
-            <div style='background: {grade_color}; display: inline-block; padding: 10px 25px; border-radius: 50px; margin-top: 10px;'>
-                <h3 style='color: black; margin: 0; font-weight: bold;'>📘 Predicted Grade : {grade}</h3>
+        <div style='background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 40px 30px; border-radius: 25px; text-align: center; margin: 30px 0; border: 1px solid #00FFD1;'>
+            <h3 style='color: #00FFD1;'>📊 PREDICTED EXAM SCORE</h3>
+            <h1 style='color: white; font-size: 70px;'>{final_score}<span style='font-size: 28px; color: #bbb;'>/100</span></h1>
+            <div style='background: {grade_color}; display: inline-block; padding: 10px 25px; border-radius: 50px;'>
+                <h3 style='color: black;'>📘 Grade : {grade}</h3>
             </div>
-            <p style='color: #cccccc; margin-top: 20px; font-size: 14px;'>{grade_message}</p>
+            <p style='color: #ccc; margin-top: 20px;'>{grade_message}</p>
         </div>
         """
         st.markdown(result_html, unsafe_allow_html=True)
         
-        # Progress Bar
         st.subheader("📈 Score Progress")
         st.progress(final_score / 100)
         
@@ -568,257 +488,131 @@ def main_app():
         chart_col1, chart_col2 = st.columns(2)
         
         with chart_col1:
-            st.subheader("🍩 Score Breakdown")
             fig, ax = plt.subplots(figsize=(5, 5))
             values = [final_score, 100 - final_score]
             labels = ["Your Score", "Remaining"]
             colors = ["#00FFD1", "#2C5364"]
-            explode = (0.05, 0)
-            text_color = 'white' if st.session_state.theme_mode == "dark" else '#1a1a2e'
-            ax.pie(values, labels=labels, autopct='%1.1f%%', colors=colors, explode=explode, 
-                   wedgeprops=dict(width=0.4, edgecolor=text_color), textprops={'fontsize': 10, 'fontweight': 'bold', 'color': text_color})
-            ax.set_title("Score Distribution", color=text_color, fontsize=12, pad=20)
-            ax.axis('equal')
+            ax.pie(values, labels=labels, autopct='%1.1f%%', colors=colors, 
+                   wedgeprops=dict(width=0.4))
+            ax.set_title("Score Distribution", color='white', pad=20)
             st.pyplot(fig)
         
         with chart_col2:
-            st.subheader("📊 Performance Meter")
             fig2, ax2 = plt.subplots(figsize=(5, 5))
             categories = ['Your Score', 'Class Average', 'Target Score']
             values2 = [final_score, 65, 85]
-            colors2 = ['#00FFD1' if st.session_state.theme_mode == "dark" else '#0f3460', '#FFA500', '#FF6B6B']
-            bars = ax2.bar(categories, values2, color=colors2, alpha=0.7)
+            ax2.bar(categories, values2, color=['#00FFD1', '#FFA500', '#FF6B6B'])
             ax2.set_ylim(0, 100)
             ax2.set_ylabel('Score')
-            ax2.set_title('Performance Comparison', fontsize=12)
-            
-            if st.session_state.theme_mode == "dark":
-                ax2.tick_params(colors='white')
-                ax2.spines['bottom'].set_color('white')
-                ax2.spines['left'].set_color('white')
-                ax2.yaxis.label.set_color('white')
-                ax2.title.set_color('white')
-                for label in ax2.get_xticklabels():
-                    label.set_color('white')
-            else:
-                ax2.tick_params(colors='#1a1a2e')
-                ax2.spines['bottom'].set_color('#1a1a2e')
-                ax2.spines['left'].set_color('#1a1a2e')
-                ax2.yaxis.label.set_color('#1a1a2e')
-                ax2.title.set_color('#1a1a2e')
-                for label in ax2.get_xticklabels():
-                    label.set_color('#1a1a2e')
-            
-            ax2.spines['top'].set_visible(False)
-            ax2.spines['right'].set_visible(False)
-            
-            for bar, value in zip(bars, values2):
-                height = bar.get_height()
-                text_color = 'white' if st.session_state.theme_mode == "dark" else '#1a1a2e'
-                ax2.text(bar.get_x() + bar.get_width()/2., height + 2, f'{value}', 
-                        ha='center', va='bottom', color=text_color, fontweight='bold')
+            ax2.set_title('Performance Comparison')
+            ax2.tick_params(colors='white')
+            for spine in ax2.spines.values():
+                spine.set_color('white')
+            ax2.yaxis.label.set_color('white')
+            ax2.title.set_color('white')
+            for label in ax2.get_xticklabels():
+                label.set_color('white')
             st.pyplot(fig2)
         
         # Insights
-        st.subheader("💡 Personalized Insights")
-        
-        insight_html = f"""
-        <div class="insight-card">
-            <strong>📊 Score Analysis:</strong> {grade_message}
-        </div>
-        <div class="insight-card">
-            <strong>⏰ Study Pattern:</strong> You studied {hours} hours. 
-            {"Great consistency! 🌟" if hours >= 6 else "Try to increase study time to 6+ hours 📚"}
-        </div>
-        <div class="insight-card">
-            <strong>📋 Attendance Impact:</strong> Your attendance is {attendance}%. 
-            {"Excellent! Keep it up! 👏" if attendance >= 85 else "Higher attendance leads to better scores 🎯"}
-        </div>
-        <div class="insight-card">
-            <strong>😴 Sleep & Performance:</strong> You sleep {sleep} hours.
-            {"Perfect for learning! 🧠" if sleep >= 7 else "Try to get 7-8 hours of sleep 😊"}
-        </div>
-        """
-        st.markdown(insight_html, unsafe_allow_html=True)
-        
-        # Key Factors
-        st.subheader("🔍 Key Factors Affecting Your Score")
-        
-        factors_html = f"""
-        <div class="insight-card">
-            <strong>💪 Motivation Level:</strong> {motivation}
-            {" - Great! Boosts performance! 🚀" if motivation == "High" else " - Set small daily goals to stay motivated 🎯"}
-        </div>
-        <div class="insight-card">
-            <strong>👪 Parental Involvement:</strong> {parent}
-            {" - Strong support system! 🤝" if parent == "High" else " - More support could improve scores 💕"}
-        </div>
-        <div class="insight-card">
-            <strong>📚 Learning Resources:</strong> {resources}
-            {" - Excellent resources! 📖" if resources == "High" else " - Explore free online resources 💻"}
-        </div>
-        <div class="insight-card">
-            <strong>👥 Peer Influence:</strong> {peer}
-            {" - Positive influence helps! 🌟" if peer == "Positive" else " - Surround yourself with motivated peers 👨‍🎓"}
-        </div>
-        """
-        st.markdown(factors_html, unsafe_allow_html=True)
+        st.subheader("💡 Insights")
+        st.info(f"📊 Score Analysis: {grade_message}")
+        st.info(f"⏰ Study Pattern: You studied {hours} hours. {'Great consistency! 🌟' if hours >= 6 else 'Try to increase study time to 6+ hours 📚'}")
+        st.info(f"📋 Attendance: {attendance}% - {'Excellent! 👏' if attendance >= 85 else 'Higher attendance = better scores 🎯'}")
+        st.info(f"😴 Sleep: {sleep} hours - {'Perfect! 🧠' if sleep >= 7 else 'Try 7-8 hours of sleep 😊'}")
         
         # Tips
         st.subheader("📌 Improvement Tips")
-        
         tips = []
         if final_score < 60:
             tips.append("🎯 Increase study hours to at least 6 hours daily")
         if attendance < 75:
             tips.append("🎯 Improve attendance to 85% or higher")
         if motivation != "High":
-            tips.append("🎯 Set clear academic goals to boost motivation")
-        if resources != "High":
-            tips.append("🎯 Use Khan Academy, Coursera, or YouTube for free learning")
+            tips.append("🎯 Set clear academic goals")
         if sleep < 7:
-            tips.append("🎯 Maintain 7-8 hours of sleep for better concentration")
-        if parent != "High":
-            tips.append("🎯 Discuss progress regularly with parents/guardians")
+            tips.append("🎯 Get 7-8 hours of sleep")
         
         if tips:
             for tip in tips:
                 st.info(tip)
         else:
-            st.success("🎉 You're doing everything right! Keep up the great work!")
+            st.success("🎉 Great work! Keep it up!")
         
-        # Report
+        # Download report
         report = f"""
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-              STUDENT SCORE PREDICTION REPORT
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-👤 USER: {st.session_state.user_name}
-👔 ROLE: {st.session_state.user_role.title()}
-"""
-        if st.session_state.user_role == "parent" and "child_name" in st.session_state:
-            report += f"👶 CHILD: {st.session_state.child_name}\n"
-        
-        report += f"""📅 DATE: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-
-📊 PREDICTED SCORE: {final_score}/100
-🎓 PREDICTED GRADE: {grade}
-💬 ASSESSMENT: {grade_message}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📈 RECOMMENDATIONS:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-"""
-
-        for tip in tips:
-            report += f"  ✓ {tip}\n"
-
-        report += """
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         GENERATED BY STUDENT SCORE PREDICTOR
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STUDENT SCORE REPORT
+-------------------
+User: {st.session_state.user_name}
+Role: {st.session_state.user_role}
+Score: {final_score}/100
+Grade: {grade}
         """
-        
-        # Download Button
-        col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
-        with col_btn2:
-            st.download_button(
-                label="📥 Download Report (TXT)",
-                data=report,
-                file_name=f"report_{st.session_state.username}_{final_score}_{grade}.txt",
-                mime="text/plain",
-                use_container_width=True
-            )
-        
-        # Celebration
-        if final_score >= 80:
-            st.balloons()
-            st.snow()
-            st.success("🏆 EXCELLENT WORK! Keep shining! 🌟")
-        elif final_score >= 60:
-            st.balloons()
-            st.success("🎉 Good job! You're making progress!")
-        else:
-            st.info("💪 Keep working hard! Every expert was once a beginner.")
-        
-        st.markdown("---")
-        st.caption("🎓 Student Score Predictor")
+        st.download_button("📥 Download Report", report, file_name=f"report_{final_score}.txt")
 
 # =========================
 # REGISTRATION PAGE
 # =========================
 def show_register_page():
-    # Force text visibility in registration page
     st.markdown("""
     <style>
     .stApp {
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
+        background: linear-gradient(135deg, #0F2027 0%, #203A43 100%) !important;
     }
-    label {
+    label, p, div {
         color: white !important;
-        font-weight: bold !important;
     }
-    .stTextInput input, .stSelectbox select {
+    .stTextInput input {
+        background-color: #1a1a2e !important;
         color: white !important;
-        background-color: #333 !important;
         border: 1px solid #00FFD1 !important;
-    }
-    p, div, span, h1, h2, h3 {
-        color: white !important;
     }
     </style>
     """, unsafe_allow_html=True)
     
-    col1, col2, col3 = st.columns([1, 2, 1])
+    st.markdown("<h1 style='text-align: center; color: #00FFD1;'>📝 Create Account</h1>", unsafe_allow_html=True)
     
+    col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        st.markdown("""
-        <div style="background: rgba(0,0,0,0.5); padding: 30px; border-radius: 20px; border: 1px solid #00FFD1;">
-            <h2 style="text-align: center; color: #00FFD1;">📝 Create New Account</h2>
-        """, unsafe_allow_html=True)
-        
-        new_username = st.text_input("👤 Username", key="reg_username")
-        new_password = st.text_input("🔒 Password", type="password", key="reg_password")
-        confirm_password = st.text_input("✅ Confirm Password", type="password", key="reg_confirm")
-        full_name = st.text_input("📝 Full Name", key="reg_name")
-        email = st.text_input("📧 Email", key="reg_email")
-        role = st.selectbox("👔 Role", ["student", "teacher", "parent"], key="reg_role")
+        new_username = st.text_input("Username")
+        new_password = st.text_input("Password", type="password")
+        confirm = st.text_input("Confirm Password", type="password")
+        full_name = st.text_input("Full Name")
+        email = st.text_input("Email")
+        role = st.selectbox("Role", ["student", "teacher", "parent"])
         
         child_name = None
         if role == "parent":
-            child_name = st.text_input("👶 Child's Name", key="reg_child_name")
+            child_name = st.text_input("Child's Name")
         
         col_btn1, col_btn2 = st.columns(2)
         with col_btn1:
-            if st.button("✅ Register", use_container_width=True):
+            if st.button("✅ Register"):
                 if new_username and new_password and full_name:
-                    if new_password == confirm_password:
+                    if new_password == confirm:
                         if new_username not in users_db:
-                            user_data = {
+                            users_db[new_username] = {
                                 "password": new_password,
                                 "name": full_name,
                                 "role": role,
                                 "email": email
                             }
-                            if role == "parent" and child_name:
-                                user_data["child_name"] = child_name
-                            users_db[new_username] = user_data
+                            if child_name:
+                                users_db[new_username]["child_name"] = child_name
                             st.success("✅ Registration successful! Please login.")
                             st.session_state.show_register = False
                             st.rerun()
                         else:
-                            st.error("❌ Username already exists!")
+                            st.error("Username exists!")
                     else:
-                        st.error("❌ Passwords do not match!")
+                        st.error("Passwords don't match!")
                 else:
-                    st.warning("⚠️ Please fill all fields!")
+                    st.warning("Fill all fields!")
         
         with col_btn2:
-            if st.button("🔙 Back to Login", use_container_width=True):
+            if st.button("🔙 Back"):
                 st.session_state.show_register = False
                 st.rerun()
-        
-        st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================
 # APP ROUTING
