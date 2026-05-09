@@ -147,10 +147,10 @@ st.write("Fill student details to predict exam performance.")
 col1, col2 = st.columns(2)
 
 with col1:
-    hours = st.number_input("Hours Studied", min_value=0.0, max_value=24.0, step=0.5)
-    attendance = st.number_input("Attendance (%)", min_value=0.0, max_value=100.0, step=1.0)
-    previous = st.number_input("Previous Score", min_value=0.0, max_value=100.0, step=1.0)
-    sleep = st.number_input("Sleep Hours", min_value=0.0, max_value=12.0, step=0.5)
+    hours = st.number_input("Hours Studied", min_value=0.0, max_value=24.0, step=0.5, value=5.0)
+    attendance = st.number_input("Attendance (%)", min_value=0.0, max_value=100.0, step=1.0, value=75.0)
+    previous = st.number_input("Previous Score", min_value=0.0, max_value=100.0, step=1.0, value=65.0)
+    sleep = st.number_input("Sleep Hours", min_value=0.0, max_value=12.0, step=0.5, value=7.0)
 
 with col2:
     motivation = st.selectbox("Motivation Level", ["Low", "Medium", "High"])
@@ -215,24 +215,30 @@ if st.button("🔮 Predict Score", use_container_width=True):
     if final_score >= 90:
         grade = "A+"
         grade_color = "#FFD700"
+        grade_message = "🏆 Outstanding! Keep up the excellent work!"
     elif final_score >= 80:
         grade = "A"
         grade_color = "#92FE9D"
+        grade_message = "🎉 Excellent! You're doing great!"
     elif final_score >= 70:
         grade = "B"
         grade_color = "#64E986"
+        grade_message = "👍 Good job! A little more effort for an A!"
     elif final_score >= 60:
         grade = "C"
         grade_color = "#FFD700"
+        grade_message = "📚 Not bad! Focus on weaker areas to improve."
     elif final_score >= 50:
         grade = "D"
         grade_color = "#FFA500"
+        grade_message = "⚠️ Needs improvement. Consider studying harder."
     else:
         grade = "F"
         grade_color = "#FF6B6B"
+        grade_message = "❌ Failing. Immediate action required!"
 
     # =========================
-    # RESULT CARD (FIXED HTML)
+    # RESULT CARD - COMPLETELY FIXED HTML
     # =========================
     result_html = f"""
     <div style='
@@ -242,47 +248,27 @@ if st.button("🔮 Predict Score", use_container_width=True):
         text-align: center;
         box-shadow: 0px 10px 30px rgba(0,255,200,0.2);
         margin-top: 30px;
+        margin-bottom: 30px;
         border: 1px solid rgba(0,255,209,0.3);
     '>
-        <h3 style='
-            color: #00FFD1;
-            margin-bottom: 15px;
-            letter-spacing: 2px;
-            font-size: 20px;
-        '>
+        <h3 style='color: #00FFD1; margin-bottom: 15px; letter-spacing: 2px; font-size: 20px;'>
             📊 PREDICTED EXAM SCORE
         </h3>
 
-        <h1 style='
-            color: white;
-            font-size: 70px;
-            margin: 10px 0;
-            font-weight: bold;
-        '>
+        <h1 style='color: white; font-size: 70px; margin: 10px 0; font-weight: bold;'>
             {final_score}
-            <span style='
-                font-size: 28px;
-                color: #bbbbbb;
-            '>
-                /100
-            </span>
+            <span style='font-size: 28px; color: #bbbbbb;'>/100</span>
         </h1>
 
-        <div style='
-            background: {grade_color};
-            display: inline-block;
-            padding: 10px 25px;
-            border-radius: 50px;
-            margin-top: 10px;
-        '>
-            <h3 style='
-                color: black;
-                margin: 0;
-                font-weight: bold;
-            '>
+        <div style='background: {grade_color}; display: inline-block; padding: 10px 25px; border-radius: 50px; margin-top: 10px;'>
+            <h3 style='color: black; margin: 0; font-weight: bold;'>
                 📘 Predicted Grade : {grade}
             </h3>
         </div>
+        
+        <p style='color: #cccccc; margin-top: 20px; font-size: 14px;'>
+            {grade_message}
+        </p>
     </div>
     """
 
@@ -293,118 +279,237 @@ if st.button("🔮 Predict Score", use_container_width=True):
     # =========================
     st.subheader("📈 Score Progress")
     st.progress(final_score / 100)
+    
+    # Display percentage
+    st.caption(f"🎯 {final_score}% of maximum score achieved")
 
     # =========================
-    # DONUT CHART
+    # TWO COLUMN LAYOUT FOR CHARTS
     # =========================
-    st.subheader("🍩 Score Breakdown")
-    fig, ax = plt.subplots(figsize=(6, 6))
+    chart_col1, chart_col2 = st.columns(2)
 
-    values = [final_score, 100 - final_score]
-    labels = ["Your Score", "Remaining"]
-    colors = ["#00FFD1", "#2C5364"]
-    explode = (0.05, 0)
+    with chart_col1:
+        # DONUT CHART
+        st.subheader("🍩 Score Breakdown")
+        fig, ax = plt.subplots(figsize=(5, 5))
 
-    wedges, texts, autotexts = ax.pie(
-        values,
-        labels=labels,
-        autopct='%1.1f%%',
-        colors=colors,
-        explode=explode,
-        wedgeprops=dict(width=0.4, edgecolor='white'),
-        textprops={'fontsize': 12, 'fontweight': 'bold'}
-    )
+        values = [final_score, 100 - final_score]
+        labels = ["Your Score", "Remaining"]
+        colors = ["#00FFD1", "#2C5364"]
+        explode = (0.05, 0)
 
-    for text in texts:
-        text.set_color('white')
-    for autotext in autotexts:
-        autotext.set_color('white')
-        autotext.set_fontweight('bold')
+        wedges, texts, autotexts = ax.pie(
+            values,
+            labels=labels,
+            autopct='%1.1f%%',
+            colors=colors,
+            explode=explode,
+            wedgeprops=dict(width=0.4, edgecolor='white'),
+            textprops={'fontsize': 10, 'fontweight': 'bold'}
+        )
 
-    ax.set_title("Predicted Score Analysis", color='white', fontsize=14, pad=20)
-    ax.axis('equal')
+        for text in texts:
+            text.set_color('white')
+        for autotext in autotexts:
+            autotext.set_color('white')
+            autotext.set_fontweight('bold')
 
-    st.pyplot(fig)
+        ax.set_title("Score Distribution", color='white', fontsize=12, pad=20)
+        ax.axis('equal')
+        st.pyplot(fig)
+
+    with chart_col2:
+        # BAR CHART FOR COMPARISON
+        st.subheader("📊 Performance Meter")
+        fig2, ax2 = plt.subplots(figsize=(5, 5))
+        
+        categories = ['Your Score', 'Class Average', 'Target Score']
+        values2 = [final_score, 65, 85]
+        colors2 = ['#00FFD1', '#FFA500', '#FF6B6B']
+        
+        bars = ax2.bar(categories, values2, color=colors2, alpha=0.7)
+        ax2.set_ylim(0, 100)
+        ax2.set_ylabel('Score', color='white')
+        ax2.set_title('Performance Comparison', color='white', fontsize=12)
+        ax2.tick_params(colors='white')
+        ax2.spines['bottom'].set_color('white')
+        ax2.spines['left'].set_color('white')
+        ax2.spines['top'].set_visible(False)
+        ax2.spines['right'].set_visible(False)
+        
+        # Add value labels on bars
+        for bar, value in zip(bars, values2):
+            height = bar.get_height()
+            ax2.text(bar.get_x() + bar.get_width()/2., height + 2,
+                    f'{value}', ha='center', va='bottom', color='white', fontweight='bold')
+        
+        st.pyplot(fig2)
 
     # =========================
-    # INSIGHTS
+    # PERFORMANCE INSIGHTS
     # =========================
-    st.subheader("💡 Performance Insights")
+    st.subheader("💡 Personalized Insights")
     
     insight_col1, insight_col2, insight_col3 = st.columns(3)
     
     with insight_col1:
         if final_score >= 75:
-            st.success("🎉 Excellent performance!")
+            st.success("🎉 Excellent performance! You're on the right track!")
         elif final_score >= 50:
-            st.warning("📚 Good, but room for improvement")
+            st.warning("📚 Good effort! Keep pushing for better results!")
         else:
-            st.error("⚠️ Needs significant improvement")
+            st.error("⚠️ Needs significant improvement. Let's work on it!")
     
     with insight_col2:
-        if hours >= 5:
-            st.info(f"⏰ Studied {hours} hours - Good consistency!")
+        if hours >= 6:
+            st.success(f"⏰ Great! You studied {hours} hours. Consistency is key!")
+        elif hours >= 4:
+            st.info(f"⏰ Studied {hours} hours - Try to increase study time")
         else:
-            st.info(f"⏰ Study more - {hours} hours is below average")
+            st.warning(f"⏰ Only {hours} hours studied - Try to study at least 4-6 hours")
     
     with insight_col3:
-        if attendance >= 75:
-            st.info(f"📖 {attendance}% attendance - Keep it up!")
+        if attendance >= 85:
+            st.success(f"📖 Excellent attendance at {attendance}%!")
+        elif attendance >= 70:
+            st.info(f"📖 {attendance}% attendance - Try to attend more classes")
         else:
-            st.info(f"📖 Low attendance ({attendance}%) affects performance")
+            st.warning(f"📖 Low attendance ({attendance}%) - This affects your score!")
+
+    # Additional insights based on other factors
+    st.subheader("🔍 Key Factors Affecting Your Score")
+    
+    factor_col1, factor_col2 = st.columns(2)
+    
+    with factor_col1:
+        if motivation == "High":
+            st.success("💪 High motivation is boosting your performance!")
+        elif motivation == "Medium":
+            st.info("💪 Medium motivation - Try setting specific goals")
+        else:
+            st.warning("💪 Low motivation - Find ways to stay inspired!")
+            
+        if resources == "High":
+            st.success("📚 Good learning resources available!")
+        elif resources == "Medium":
+            st.info("📚 Consider getting additional learning materials")
+        else:
+            st.warning("📚 Limited resources - Explore free online resources")
+    
+    with factor_col2:
+        if parent == "High":
+            st.success("👪 Strong parental support helps your performance!")
+        elif parent == "Medium":
+            st.info("👪 Parental involvement can be increased")
+        else:
+            st.warning("👪 More parental support could improve scores")
+            
+        if sleep >= 7:
+            st.success("😴 Good sleep habits - Essential for learning!")
+        elif sleep >= 6:
+            st.info("😴 Try to get 7-8 hours of sleep for better focus")
+        else:
+            st.warning("😴 Sleep deprivation affects academic performance")
 
     # =========================
-    # REPORT
+    # REPORT GENERATION
     # =========================
     report = f"""
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    STUDENT SCORE REPORT
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+              STUDENT SCORE PREDICTION REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 📊 PREDICTED SCORE: {final_score}/100
 🎓 PREDICTED GRADE: {grade}
+💬 ASSESSMENT: {grade_message}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📌 INPUT DETAILS:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⏰ Hours Studied     : {hours}
-📋 Attendance (%)    : {attendance}
-📈 Previous Score    : {previous}
-😴 Sleep Hours       : {sleep}
-💪 Motivation Level  : {motivation}
-👨‍🏫 Teacher Quality   : {teacher}
-🏫 School Type       : {school}
-🌐 Internet Access   : {internet}
-💰 Family Income     : {income}
-👪 Parental Involvement : {parent}
-🎓 Parent Education     : {education}
-👥 Peer Influence    : {peer}
-📚 Learning Resources : {resources}
-⚽ Extracurricular Activities : {activities}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📌 STUDENT INPUT DETAILS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    GENERATED BY STUDENT SCORE PREDICTOR
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ACADEMIC FACTORS:
+  ⏰ Hours Studied        : {hours} hours
+  📋 Attendance (%)       : {attendance}%
+  📈 Previous Score       : {previous}/100
+  😴 Sleep Hours          : {sleep} hours
+
+PERSONAL FACTORS:
+  💪 Motivation Level     : {motivation}
+  👥 Peer Influence       : {peer}
+  👪 Parental Involvement : {parent}
+  🎓 Parent Education     : {education}
+
+SCHOOL & RESOURCES:
+  👨‍🏫 Teacher Quality      : {teacher}
+  🏫 School Type          : {school}
+  📚 Learning Resources   : {resources}
+  ⚽ Extracurricular      : {activities}
+
+ENVIRONMENT FACTORS:
+  🌐 Internet Access      : {internet}
+  💰 Family Income        : {income}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📈 RECOMMENDATIONS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 """
+
+    # Add personalized recommendations
+    if final_score < 60:
+        report += "  ✓ Increase study hours to at least 6 hours daily\n"
+    if attendance < 75:
+        report += "  ✓ Improve attendance to 85% or higher\n"
+    if motivation != "High":
+        report += "  ✓ Set clear academic goals to boost motivation\n"
+    if resources != "High":
+        report += "  ✓ Utilize online learning platforms (YouTube, Coursera, Khan Academy)\n"
+    if sleep < 7:
+        report += "  ✓ Maintain 7-8 hours of sleep for better concentration\n"
+    if parent != "High":
+        report += "  ✓ Discuss your progress regularly with parents/guardians\n"
+    
+    if final_score >= 75:
+        report += "\n  🌟 Keep up the excellent work! You're on the path to success!\n"
+    elif final_score >= 50:
+        report += "\n  📚 You're doing well! Focus on improving weak areas to reach the next level.\n"
+    else:
+        report += "\n  💪 Don't get discouraged! Use this report to identify areas needing improvement.\n"
+
+    report += """
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         GENERATED BY STUDENT SCORE PREDICTOR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    """
 
     # =========================
     # DOWNLOAD BUTTON
     # =========================
-    st.download_button(
-        label="📥 Download Full Report (TXT)",
-        data=report,
-        file_name=f"student_report_score_{final_score}.txt",
-        mime="text/plain",
-        use_container_width=True
-    )
+    col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
+    with col_btn2:
+        st.download_button(
+            label="📥 Download Complete Report (TXT)",
+            data=report,
+            file_name=f"student_report_{final_score}_{grade}.txt",
+            mime="text/plain",
+            use_container_width=True
+        )
 
     # =========================
-    # CELEBRATION
+    # CELEBRATION EFFECTS
     # =========================
     if final_score >= 80:
         st.balloons()
         st.snow()
+        st.success("🏆 EXCELLENT WORK! Keep shining! 🌟")
     elif final_score >= 60:
         st.balloons()
+        st.info("🎉 Good job! You're making progress!")
     else:
-        st.info("💪 Don't give up! Use this prediction as motivation to study harder!")
+        st.info("💪 Remember: Every expert was once a beginner. Keep working hard!")
+
+    # =========================
+    # SHARE BUTTON AREA
+    # =========================
+    st.markdown("---")
+    st.caption("🎓 Student Score Predictor - Helping students achieve their academic goals")
