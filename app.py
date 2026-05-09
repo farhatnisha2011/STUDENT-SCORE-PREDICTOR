@@ -823,4 +823,91 @@ ENVIRONMENT FACTORS:
         else:
             st.info("💪 Remember: Every expert was once a beginner. Keep working hard!")
         
-        st
+        st.markdown("---")
+        st.caption("🎓 Student Score Predictor - Helping students achieve their academic goals")
+
+# =========================
+# REGISTRATION PAGE
+# =========================
+def show_register_page():
+    st.markdown("""
+    <style>
+    .register-container {
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 40px;
+        background: linear-gradient(135deg, #141E30 0%, #243B55 100%);
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        margin-top: 50px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1, 2, 1])
+    
+    with col2:
+        st.markdown('<div class="register-container">', unsafe_allow_html=True)
+        st.markdown('<h2 style="text-align: center; color: #00FFD1;">📝 Register New Account</h2>', unsafe_allow_html=True)
+        
+        new_username = st.text_input("👤 Username", key="reg_username")
+        new_password = st.text_input("🔒 Password", type="password", key="reg_password")
+        confirm_password = st.text_input("✅ Confirm Password", type="password", key="reg_confirm")
+        full_name = st.text_input("📝 Full Name", key="reg_name")
+        email = st.text_input("📧 Email", key="reg_email")
+        role = st.selectbox("👔 Role", ["student", "teacher", "parent"], key="reg_role")
+        
+        child_name = None
+        if role == "parent":
+            child_name = st.text_input("👶 Child's Name", key="reg_child_name")
+        
+        col_btn1, col_btn2 = st.columns(2)
+        with col_btn1:
+            if st.button("✅ Register", use_container_width=True):
+                if new_username and new_password and full_name:
+                    if new_password == confirm_password:
+                        if new_username not in users_db:
+                            user_data = {
+                                "password": new_password,
+                                "name": full_name,
+                                "role": role,
+                                "email": email
+                            }
+                            if role == "parent" and child_name:
+                                user_data["child_name"] = child_name
+                            users_db[new_username] = user_data
+                            st.success("✅ Registration successful! Please login.")
+                            st.session_state.show_register = False
+                            st.rerun()
+                        else:
+                            st.error("❌ Username already exists!")
+                    else:
+                        st.error("❌ Passwords do not match!")
+                else:
+                    st.warning("⚠️ Please fill all required fields!")
+        
+        with col_btn2:
+            if st.button("🔙 Back to Login", use_container_width=True):
+                st.session_state.show_register = False
+                st.rerun()
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+
+# =========================
+# APP ROUTING
+# =========================
+if "show_register" not in st.session_state:
+    st.session_state.show_register = False
+
+if not check_login_status():
+    if st.session_state.show_register:
+        show_register_page()
+    else:
+        show_login_page()
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            if st.button("📝 Create New Account", use_container_width=True):
+                st.session_state.show_register = True
+                st.rerun()
+else:
+    main_app()
