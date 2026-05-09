@@ -43,15 +43,17 @@ if st.session_state.theme_mode == "dark":
     html, body, [class*="css"] {
         color: white !important;
     }
-    h1 {
-        color: #00FFD1 !important;
-        text-align: center;
-        font-size: 42px;
-        font-weight: bold;
-    }
-    label {
+    h1, h2, h3, h4, h5, h6 {
         color: white !important;
-        font-weight: 600;
+    }
+    .stMarkdown, p, div, span {
+        color: white !important;
+    }
+    .st-emotion-cache-1v0mbdj, .st-emotion-cache-10trblm {
+        color: white !important;
+    }
+    label, .stSelectbox label, .stNumberInput label {
+        color: white !important;
     }
     .stNumberInput input {
         background-color: #111111 !important;
@@ -65,14 +67,10 @@ if st.session_state.theme_mode == "dark":
         border-radius: 10px !important;
         border: 1px solid #555 !important;
     }
-    div[data-baseweb="select"] span {
+    div[data-baseweb="select"] span, div[data-baseweb="select"] div {
         color: white !important;
     }
-    ul {
-        background-color: #111111 !important;
-        border-radius: 10px !important;
-    }
-    li {
+    ul, li {
         background-color: #111111 !important;
         color: white !important;
     }
@@ -106,12 +104,22 @@ if st.session_state.theme_mode == "dark":
     .stProgress > div > div > div > div {
         background-color: #00FFD1;
     }
+    .stAlert, .stSuccess, .stInfo, .stWarning, .stError {
+        color: black !important;
+    }
     .insight-card {
-        background: rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.15);
         border-radius: 10px;
         padding: 15px;
         margin: 10px 0;
         border-left: 4px solid #00FFD1;
+        color: white !important;
+    }
+    .insight-card strong {
+        color: #00FFD1 !important;
+    }
+    .stCaption, caption {
+        color: #cccccc !important;
     }
     </style>
     """
@@ -124,11 +132,8 @@ else:
     html, body, [class*="css"] {
         color: #1a1a2e !important;
     }
-    h1 {
+    h1, h2, h3, h4, h5, h6 {
         color: #0f3460 !important;
-        text-align: center;
-        font-size: 42px;
-        font-weight: bold;
     }
     label {
         color: #1a1a2e !important;
@@ -187,6 +192,10 @@ else:
         padding: 15px;
         margin: 10px 0;
         border-left: 4px solid #0f3460;
+        color: #1a1a2e !important;
+    }
+    .insight-card strong {
+        color: #0f3460 !important;
     }
     </style>
     """
@@ -297,11 +306,18 @@ if st.button("🔮 Predict Score", use_container_width=True):
         grade_color = "#FF6B6B"
         grade_message = "❌ Failing. Immediate action required!"
 
-    # Result Card
+    # Result Card - Fixed for both themes
+    if st.session_state.theme_mode == "dark":
+        result_bg = "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)"
+        text_color = "white"
+    else:
+        result_bg = "linear-gradient(135deg, #141E30 0%, #243B55 100%)"
+        text_color = "white"
+    
     result_html = f"""
-    <div style='background: linear-gradient(135deg, #141E30 0%, #243B55 100%); padding: 40px 30px; border-radius: 25px; text-align: center; box-shadow: 0px 10px 30px rgba(0,255,200,0.2); margin-top: 30px; margin-bottom: 30px; border: 1px solid rgba(0,255,209,0.3);'>
+    <div style='background: {result_bg}; padding: 40px 30px; border-radius: 25px; text-align: center; box-shadow: 0px 10px 30px rgba(0,200,255,0.2); margin-top: 30px; margin-bottom: 30px; border: 1px solid #00FFD1;'>
         <h3 style='color: #00FFD1; margin-bottom: 15px; letter-spacing: 2px; font-size: 20px;'>📊 PREDICTED EXAM SCORE</h3>
-        <h1 style='color: white; font-size: 70px; margin: 10px 0; font-weight: bold;'>{final_score}<span style='font-size: 28px; color: #bbbbbb;'>/100</span></h1>
+        <h1 style='color: {text_color}; font-size: 70px; margin: 10px 0; font-weight: bold;'>{final_score}<span style='font-size: 28px; color: #bbbbbb;'>/100</span></h1>
         <div style='background: {grade_color}; display: inline-block; padding: 10px 25px; border-radius: 50px; margin-top: 10px;'>
             <h3 style='color: black; margin: 0; font-weight: bold;'>📘 Predicted Grade : {grade}</h3>
         </div>
@@ -325,9 +341,14 @@ if st.button("🔮 Predict Score", use_container_width=True):
         labels = ["Your Score", "Remaining"]
         colors = ["#00FFD1", "#2C5364"]
         explode = (0.05, 0)
-        ax.pie(values, labels=labels, autopct='%1.1f%%', colors=colors, explode=explode, 
-               wedgeprops=dict(width=0.4, edgecolor='white'), textprops={'fontsize': 10, 'fontweight': 'bold'})
-        ax.set_title("Score Distribution", color='white' if st.session_state.theme_mode == "dark" else '#0f3460', fontsize=12, pad=20)
+        
+        # Set text color based on theme
+        text_color = 'white' if st.session_state.theme_mode == "dark" else '#1a1a2e'
+        
+        wedges, texts, autotexts = ax.pie(values, labels=labels, autopct='%1.1f%%', colors=colors, explode=explode, 
+               wedgeprops=dict(width=0.4, edgecolor=text_color), textprops={'fontsize': 10, 'fontweight': 'bold', 'color': text_color})
+        
+        ax.set_title("Score Distribution", color=text_color, fontsize=12, pad=20)
         ax.axis('equal')
         st.pyplot(fig)
 
@@ -349,12 +370,18 @@ if st.button("🔮 Predict Score", use_container_width=True):
             ax2.spines['left'].set_color('white')
             ax2.yaxis.label.set_color('white')
             ax2.title.set_color('white')
+            ax2.xaxis.label.set_color('white')
+            for label in ax2.get_xticklabels():
+                label.set_color('white')
         else:
             ax2.tick_params(colors='#1a1a2e')
             ax2.spines['bottom'].set_color('#1a1a2e')
             ax2.spines['left'].set_color('#1a1a2e')
             ax2.yaxis.label.set_color('#1a1a2e')
             ax2.title.set_color('#1a1a2e')
+            ax2.xaxis.label.set_color('#1a1a2e')
+            for label in ax2.get_xticklabels():
+                label.set_color('#1a1a2e')
         
         ax2.spines['top'].set_visible(False)
         ax2.spines['right'].set_visible(False)
