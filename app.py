@@ -17,8 +17,6 @@ st.set_page_config(
 # =========================
 # USER DATABASE (In production, use a real database)
 # =========================
-# This is a simple dictionary for demo purposes
-# In production, store this in a secure database
 users_db = {
     "student1": {
         "password": hashlib.sha256("pass123".encode()).hexdigest(),
@@ -41,19 +39,15 @@ users_db = {
 }
 
 def hash_password(password):
-    """Hash a password for storing."""
     return hashlib.sha256(password.encode()).hexdigest()
 
 def verify_password(stored_hash, provided_password):
-    """Verify a stored password against one provided by user."""
     return stored_hash == hashlib.sha256(provided_password.encode()).hexdigest()
 
 def check_login_status():
-    """Check if user is logged in."""
     return st.session_state.get("logged_in", False)
 
 def login_user(username, user_data):
-    """Set session state for logged in user."""
     st.session_state.logged_in = True
     st.session_state.username = username
     st.session_state.user_name = user_data["name"]
@@ -62,7 +56,6 @@ def login_user(username, user_data):
     st.session_state.login_time = datetime.now()
 
 def logout_user():
-    """Clear session state for logout."""
     st.session_state.logged_in = False
     st.session_state.username = None
     st.session_state.user_name = None
@@ -74,9 +67,6 @@ def logout_user():
 # LOGIN PAGE
 # =========================
 def show_login_page():
-    """Display the login page."""
-    
-    # Custom CSS for login page
     st.markdown("""
     <style>
     .login-container {
@@ -93,33 +83,9 @@ def show_login_page():
         color: #00FFD1;
         margin-bottom: 30px;
     }
-    .login-input {
-        width: 100%;
-        padding: 12px;
-        margin: 10px 0;
-        border-radius: 8px;
-        border: 1px solid #00FFD1;
-        background: rgba(255,255,255,0.1);
-        color: white;
-    }
-    .login-button {
-        width: 100%;
-        padding: 12px;
-        background: linear-gradient(to right, #00C9FF, #92FE9D);
-        color: black;
-        border: none;
-        border-radius: 8px;
-        font-weight: bold;
-        cursor: pointer;
-        margin-top: 20px;
-    }
-    .login-button:hover {
-        transform: scale(1.02);
-    }
     </style>
     """, unsafe_allow_html=True)
     
-    # Center the login form
     col1, col2, col3 = st.columns([1, 2, 1])
     
     with col2:
@@ -148,7 +114,6 @@ def show_login_page():
                 st.warning("⚠️ Please enter both username and password!")
         
         if guest_clicked:
-            # Guest login
             st.session_state.logged_in = True
             st.session_state.username = "guest"
             st.session_state.user_name = "Guest User"
@@ -168,10 +133,65 @@ if "theme_mode" not in st.session_state:
     st.session_state.theme_mode = "dark"
 
 # =========================
-# MAIN APP (shown after login)
+# MAIN APP
 # =========================
 def main_app():
-    """Main application after login."""
+    
+    # =========================
+    # FIXED SIDEBAR STYLING FOR BOTH THEMES
+    # =========================
+    if st.session_state.theme_mode == "dark":
+        sidebar_css = """
+        <style>
+        /* Sidebar styling for dark mode */
+        [data-testid="stSidebar"] {
+            background: linear-gradient(180deg, #0F2027 0%, #203A43 100%);
+        }
+        [data-testid="stSidebar"] .stMarkdown, 
+        [data-testid="stSidebar"] p, 
+        [data-testid="stSidebar"] div,
+        [data-testid="stSidebar"] span,
+        [data-testid="stSidebar"] h1,
+        [data-testid="stSidebar"] h2,
+        [data-testid="stSidebar"] h3,
+        [data-testid="stSidebar"] h4,
+        [data-testid="stSidebar"] label {
+            color: #ffffff !important;
+        }
+        [data-testid="stSidebar"] .stButton > button {
+            background: linear-gradient(to right, #00C9FF, #92FE9D);
+            color: black !important;
+        }
+        [data-testid="stSidebar"] hr {
+            border-color: #00FFD1 !important;
+        }
+        </style>
+        """
+    else:
+        sidebar_css = """
+        <style>
+        /* Sidebar styling for light mode */
+        [data-testid="stSidebar"] {
+            background: linear-gradient(180deg, #ffffff 0%, #f0f2f6 100%);
+        }
+        [data-testid="stSidebar"] .stMarkdown, 
+        [data-testid="stSidebar"] p, 
+        [data-testid="stSidebar"] div,
+        [data-testid="stSidebar"] span,
+        [data-testid="stSidebar"] h1,
+        [data-testid="stSidebar"] h2,
+        [data-testid="stSidebar"] h3,
+        [data-testid="stSidebar"] h4,
+        [data-testid="stSidebar"] label {
+            color: #1a1a2e !important;
+        }
+        [data-testid="stSidebar"] .stButton > button {
+            background: linear-gradient(to right, #0f3460, #16213e);
+            color: white !important;
+        }
+        </style>
+        """
+    st.markdown(sidebar_css, unsafe_allow_html=True)
     
     # =========================
     # LOGOUT BUTTON IN SIDEBAR
@@ -303,6 +323,11 @@ def main_app():
         .stCaption, caption {
             color: #cccccc !important;
         }
+        /* Fix for number input step buttons */
+        .stNumberInput button {
+            background-color: #333 !important;
+            color: white !important;
+        }
         </style>
         """
     else:
@@ -428,7 +453,6 @@ def main_app():
     # =========================
     if st.button("🔮 Predict Score", use_container_width=True):
         
-        # Input Data
         data = {
             "Hours_Studied": hours,
             "Attendance": attendance,
@@ -446,12 +470,10 @@ def main_app():
             "Extracurricular_Activities": activities
         }
         
-        # Convert to DataFrame
         input_df = pd.DataFrame([data])
         input_df = pd.get_dummies(input_df)
         input_df = input_df.reindex(columns=columns, fill_value=0)
         
-        # Prediction
         prediction = model.predict(input_df)[0]
         final_score = max(0, min(100, prediction))
         final_score = int(round(final_score))
@@ -513,9 +535,7 @@ def main_app():
             labels = ["Your Score", "Remaining"]
             colors = ["#00FFD1", "#2C5364"]
             explode = (0.05, 0)
-            
             text_color = 'white' if st.session_state.theme_mode == "dark" else '#1a1a2e'
-            
             ax.pie(values, labels=labels, autopct='%1.1f%%', colors=colors, explode=explode, 
                    wedgeprops=dict(width=0.4, edgecolor=text_color), textprops={'fontsize': 10, 'fontweight': 'bold', 'color': text_color})
             ax.set_title("Score Distribution", color=text_color, fontsize=12, pad=20)
@@ -562,24 +582,21 @@ def main_app():
                         ha='center', va='bottom', color=text_color, fontweight='bold')
             st.pyplot(fig2)
         
-        # Insights Section
+        # Insights
         st.subheader("💡 Personalized Insights")
         
         insight_html = f"""
         <div class="insight-card">
             <strong>📊 Score Analysis:</strong> {grade_message}
         </div>
-        
         <div class="insight-card">
             <strong>⏰ Study Pattern:</strong> You studied {hours} hours. 
             {"Great consistency! 🌟" if hours >= 6 else "Try to increase study time to 6+ hours 📚"}
         </div>
-        
         <div class="insight-card">
             <strong>📋 Attendance Impact:</strong> Your attendance is {attendance}%. 
             {"Excellent! Keep it up! 👏" if attendance >= 85 else "Higher attendance leads to better scores 🎯"}
         </div>
-        
         <div class="insight-card">
             <strong>😴 Sleep & Performance:</strong> You sleep {sleep} hours.
             {"Perfect for learning! 🧠" if sleep >= 7 else "Try to get 7-8 hours of sleep 😊"}
@@ -595,17 +612,14 @@ def main_app():
             <strong>💪 Motivation Level:</strong> {motivation}
             {" - Great! This boosts your performance! 🚀" if motivation == "High" else " - Try setting small daily goals to stay motivated 🎯"}
         </div>
-        
         <div class="insight-card">
             <strong>👪 Parental Involvement:</strong> {parent}
             {" - Strong support system! 🤝" if parent == "High" else " - More parental support could improve scores 💕"}
         </div>
-        
         <div class="insight-card">
             <strong>📚 Learning Resources:</strong> {resources}
             {" - Excellent resources available! 📖" if resources == "High" else " - Explore free online resources (YouTube, Khan Academy) 💻"}
         </div>
-        
         <div class="insight-card">
             <strong>👥 Peer Influence:</strong> {peer}
             {" - Positive peer influence helps! 🌟" if peer == "Positive" else " - Surround yourself with motivated peers 👨‍🎓"}
@@ -715,10 +729,9 @@ ENVIRONMENT FACTORS:
         st.caption("🎓 Student Score Predictor - Helping students achieve their academic goals")
 
 # =========================
-# REGISTRATION PAGE (Optional)
+# REGISTRATION PAGE
 # =========================
 def show_register_page():
-    """Display registration page for new users."""
     st.markdown("""
     <style>
     .register-container {
@@ -786,7 +799,6 @@ if not check_login_status():
         show_register_page()
     else:
         show_login_page()
-        # Add register link
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             if st.button("📝 Create New Account", use_container_width=True):
