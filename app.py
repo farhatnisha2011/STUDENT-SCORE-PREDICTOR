@@ -1,389 +1,570 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Student Score Predictor</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+import streamlit as st
+import joblib
+import pandas as pd
+import matplotlib.pyplot as plt
+from datetime import datetime
 
-    body {
-      font-family: 'Space Grotesk', sans-serif;
-      background: linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
+# =========================
+# PAGE CONFIG
+# =========================
+st.set_page_config(
+    page_title="Student Score Predictor",
+    page_icon="🎓",
+    layout="centered"
+)
+
+# =========================
+# USER DATABASE
+# =========================
+users_db = {
+    "student1": {
+        "password": "pass123",
+        "name": "John Doe",
+        "role": "student",
+        "email": "john@example.com"
+    },
+    "teacher1": {
+        "password": "teach123",
+        "name": "Ms. Smith",
+        "role": "teacher",
+        "email": "smith@school.com"
+    },
+    "parent1": {
+        "password": "parent123",
+        "name": "Robert Johnson",
+        "role": "parent",
+        "email": "parent@family.com",
+        "child_name": "Emma Johnson"
+    },
+    "parent2": {
+        "password": "mom123",
+        "name": "Sarah Williams",
+        "role": "parent",
+        "email": "sarah@family.com",
+        "child_name": "Michael Williams"
     }
+}
 
-    .wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-      max-width: 460px;
+# =========================
+# AUTO-FILL CREDENTIALS
+# =========================
+AUTO_FILL = {
+    "student": {"username": "student1", "password": "pass123"},
+    "teacher": {"username": "teacher1", "password": "teach123"},
+    "parent":  {"username": "parent1",  "password": "parent123"},
+}
+
+def check_login_status():
+    return st.session_state.get("logged_in", False)
+
+def login_user(username, user_data):
+    st.session_state.logged_in = True
+    st.session_state.username = username
+    st.session_state.user_name = user_data["name"]
+    st.session_state.user_role = user_data["role"]
+    st.session_state.user_email = user_data["email"]
+    st.session_state.login_time = datetime.now()
+    if user_data["role"] == "parent":
+        st.session_state.child_name = user_data.get("child_name", "Child")
+
+def logout_user():
+    st.session_state.logged_in = False
+    st.session_state.username = None
+    st.session_state.user_name = None
+    st.session_state.user_role = None
+    st.session_state.user_email = None
+    st.session_state.login_time = None
+    if "child_name" in st.session_state:
+        st.session_state.child_name = None
+
+# =========================
+# LOGIN PAGE
+# =========================
+def show_login_page():
+    if "selected_role" not in st.session_state:
+        st.session_state.selected_role = "student"
+
+    st.markdown("""
+    <style>
+    .stApp {
+        background: linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%) !important;
     }
-
-    .logo { font-size: 36px; margin-bottom: 6px; }
-
-    .title {
-      color: #00FFD1;
-      font-size: 26px;
-      font-weight: 700;
-      text-align: center;
-      letter-spacing: -0.5px;
-      margin-bottom: 4px;
+    .stMarkdown, p, div, span, label, h1, h2, h3, h4 {
+        color: white !important;
     }
-
-    .subtitle {
-      color: #a0bcc8;
-      font-size: 13px;
-      text-align: center;
-      margin-bottom: 1.5rem;
+    .stTextInput input {
+        background-color: #1a1a2e !important;
+        color: white !important;
+        border: 1px solid #00FFD1 !important;
+        border-radius: 8px !important;
+        padding: 10px !important;
     }
-
-    /* Role buttons */
-    .role-row {
-      display: flex;
-      gap: 10px;
-      width: 100%;
-      margin-bottom: 1rem;
+    .stTextInput input::placeholder {
+        color: #888 !important;
     }
-
-    .role-btn {
-      flex: 1;
-      padding: 10px 0;
-      border-radius: 10px;
-      border: 1.5px solid #2a4a5a;
-      background: #1a2f3a;
-      color: #a0bcc8;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: inherit;
+    .stButton button {
+        background: linear-gradient(135deg, #00C9FF, #92FE9D) !important;
+        color: black !important;
+        font-weight: bold !important;
+        border-radius: 10px !important;
+        padding: 10px !important;
+        border: none !important;
     }
-
-    .role-btn.active {
-      background: #00FFD1;
-      color: #0a2030;
-      border-color: #00FFD1;
-      font-weight: 700;
+    div[data-testid="column"] .stButton button {
+        background: #2c3e50 !important;
+        color: white !important;
     }
-
-    .role-btn:hover:not(.active) {
-      border-color: #00FFD1;
-      color: #00FFD1;
+    .stAlert {
+        background-color: #1a1a2e !important;
+        border-left-color: #00FFD1 !important;
     }
+    </style>
+    """, unsafe_allow_html=True)
 
-    /* Badge */
-    .badge {
-      background: #00FFD1;
-      color: #0a2030;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 4px 18px;
-      border-radius: 20px;
-      letter-spacing: 1px;
-      margin-bottom: 1.2rem;
-      display: inline-block;
-    }
+    st.markdown("<h1 style='text-align: center; color: #00FFD1;'>🎓 Student Score Predictor</h1>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
 
-    /* Card */
-    .card {
-      background: rgba(0, 0, 0, 0.35);
-      border: 1px solid #00FFD1;
-      border-radius: 18px;
-      padding: 1.8rem 1.6rem;
-      width: 100%;
-    }
+    # Role selection
+    st.markdown("<h3 style='text-align: center;'>Select Your Role</h3>", unsafe_allow_html=True)
 
-    .card-title {
-      color: #00FFD1;
-      font-size: 18px;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 1.2rem;
-    }
+    col1, col2, col3 = st.columns(3)
 
-    /* Autofill note */
-    .autofill-note {
-      background: rgba(0, 255, 209, 0.08);
-      border: 1px solid rgba(0, 255, 209, 0.3);
-      border-radius: 8px;
-      padding: 8px 12px;
-      color: #00FFD1;
-      font-size: 11px;
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+    with col1:
+        if st.button("🎓 Student", key="role_student", use_container_width=True):
+            st.session_state.selected_role = "student"
+            st.rerun()
 
-    /* Fields */
-    .field { margin-bottom: 1rem; }
+    with col2:
+        if st.button("👨‍🏫 Teacher", key="role_teacher", use_container_width=True):
+            st.session_state.selected_role = "teacher"
+            st.rerun()
 
-    .field label {
-      display: block;
-      color: #a0bcc8;
-      font-size: 12px;
-      font-weight: 500;
-      margin-bottom: 5px;
-      letter-spacing: 0.4px;
-    }
+    with col3:
+        if st.button("👨‍👩‍👧 Parent", key="role_parent", use_container_width=True):
+            st.session_state.selected_role = "parent"
+            st.rerun()
 
-    .field input {
-      width: 100%;
-      background: #111827;
-      border: 1px solid #00FFD1;
-      border-radius: 8px;
-      padding: 10px 14px;
-      color: #fff;
-      font-size: 14px;
-      font-family: inherit;
-      outline: none;
-      transition: box-shadow 0.15s;
-    }
-
-    .field input:focus {
-      box-shadow: 0 0 0 2px rgba(0, 255, 209, 0.25);
-    }
-
-    /* Password wrapper */
-    .pw-wrap { position: relative; }
-    .pw-wrap input { padding-right: 40px; }
-
-    .eye-btn {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #a0bcc8;
-      font-size: 18px;
-      line-height: 1;
-      padding: 0;
-    }
-
-    .eye-btn:hover { color: #00FFD1; }
-
-    /* Buttons */
-    .btn-row {
-      display: flex;
-      gap: 10px;
-      margin-top: 0.5rem;
-    }
-
-    .btn-login {
-      flex: 1;
-      background: linear-gradient(135deg, #00C9FF, #92FE9D);
-      color: #0a2030;
-      font-weight: 700;
-      font-size: 14px;
-      padding: 11px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-family: inherit;
-      transition: opacity 0.15s;
-    }
-
-    .btn-login:hover { opacity: 0.88; }
-
-    .btn-guest {
-      flex: 1;
-      background: transparent;
-      color: #a0bcc8;
-      font-weight: 500;
-      font-size: 13px;
-      padding: 11px;
-      border: 1px solid #2a4a5a;
-      border-radius: 10px;
-      cursor: pointer;
-      font-family: inherit;
-      transition: all 0.15s;
-    }
-
-    .btn-guest:hover { border-color: #00FFD1; color: #00FFD1; }
-
-    .btn-create {
-      width: 100%;
-      background: transparent;
-      color: #00FFD1;
-      font-weight: 600;
-      font-size: 13px;
-      padding: 11px;
-      border: 1px solid rgba(0, 255, 209, 0.35);
-      border-radius: 10px;
-      cursor: pointer;
-      font-family: inherit;
-      margin-top: 10px;
-      transition: all 0.15s;
-    }
-
-    .btn-create:hover { background: rgba(0, 255, 209, 0.07); }
-
-    /* Messages */
-    .success-msg {
-      background: rgba(0, 255, 209, 0.12);
-      border: 1px solid rgba(0, 255, 209, 0.4);
-      border-radius: 8px;
-      color: #00FFD1;
-      font-size: 13px;
-      padding: 10px 14px;
-      text-align: center;
-      margin-top: 10px;
-      animation: fadein 0.3s ease;
-    }
-
-    .error-msg {
-      background: rgba(255, 80, 80, 0.1);
-      border: 1px solid rgba(255, 80, 80, 0.3);
-      border-radius: 8px;
-      color: #ff7070;
-      font-size: 13px;
-      padding: 10px 14px;
-      text-align: center;
-      margin-top: 10px;
-    }
-
-    @keyframes fadein {
-      from { opacity: 0; transform: translateY(-4px); }
-      to   { opacity: 1; transform: none; }
-    }
-  </style>
-</head>
-<body>
-
-<div class="wrap">
-  <div class="logo">🎓</div>
-  <div class="title">Student Score Predictor</div>
-  <div class="subtitle">Predict &amp; track your academic performance</div>
-
-  <!-- Role buttons -->
-  <div class="role-row">
-    <button class="role-btn active" onclick="selectRole('student', this)">🎓 Student</button>
-    <button class="role-btn"        onclick="selectRole('teacher', this)">👨‍🏫 Teacher</button>
-    <button class="role-btn"        onclick="selectRole('parent',  this)">👨‍👩‍👧 Parent</button>
-  </div>
-
-  <div class="badge" id="selectedBadge">✓ SELECTED: STUDENT</div>
-
-  <!-- Login card -->
-  <div class="card">
-    <div class="card-title" id="cardTitle">🎓 Student Login</div>
-
-    <div class="autofill-note" id="autofillNote">
-      ✅ Credentials auto-filled for Student
+    st.markdown(f"""
+    <div style="text-align: center; margin: 20px 0;">
+        <span style="background: #00FFD1; color: black; padding: 8px 25px; border-radius: 20px; font-weight: bold;">
+            ✓ SELECTED: {st.session_state.selected_role.upper()}
+        </span>
     </div>
+    """, unsafe_allow_html=True)
 
-    <div class="field">
-      <label for="usernameInput">Username</label>
-      <input type="text" id="usernameInput" placeholder="Enter your username" value="student1" />
+    # ── AUTO-FILL NOTE ──────────────────────────────────────────────
+    role = st.session_state.selected_role
+    auto = AUTO_FILL[role]
+    st.markdown(f"""
+    <div style="background: rgba(0,255,209,0.08); border: 1px solid rgba(0,255,209,0.35);
+                border-radius: 10px; padding: 10px 16px; max-width: 450px; margin: 0 auto 10px auto;
+                color: #00FFD1; font-size: 13px; text-align: center;">
+        ✅ <b>Auto-filled:</b> &nbsp; Username: <code style="color:#00FFD1">{auto['username']}</code>
+        &nbsp;|&nbsp; Password: <code style="color:#00FFD1">{auto['password']}</code>
     </div>
+    """, unsafe_allow_html=True)
+    # ────────────────────────────────────────────────────────────────
 
-    <div class="field">
-      <label for="passwordInput">Password</label>
-      <div class="pw-wrap">
-        <input type="password" id="passwordInput" placeholder="Enter your password" value="pass123" />
-        <button class="eye-btn" onclick="togglePw()" aria-label="Toggle password visibility">
-          👁️
-        </button>
-      </div>
-    </div>
+    with st.container():
+        st.markdown("""
+        <div style="background: rgba(0,0,0,0.3); border-radius: 20px; padding: 30px;
+                    max-width: 450px; margin: 0 auto; border: 1px solid #00FFD1;">
+        """, unsafe_allow_html=True)
 
-    <div class="btn-row">
-      <button class="btn-login" onclick="doLogin()">🔐 LOGIN</button>
-      <button class="btn-guest" onclick="doGuest()">👤 Guest Mode</button>
-    </div>
+        role_labels = {"student": "🎓 Student Login", "teacher": "👨‍🏫 Teacher Login", "parent": "👨‍👩‍👧 Parent Login"}
+        st.markdown(f"<h2 style='text-align: center; color: #00FFD1;'>{role_labels[role]}</h2>", unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
 
-    <div id="msgBox"></div>
-  </div>
+        # ── PRE-FILLED INPUTS ────────────────────────────────────────
+        username = st.text_input("Username", value=auto["username"], key="login_username")
+        password = st.text_input("Password", type="password", value=auto["password"], key="login_password")
+        # ────────────────────────────────────────────────────────────
 
-  <button class="btn-create" onclick="showCreate()">📝 CREATE NEW ACCOUNT</button>
-</div>
+        st.markdown("<br>", unsafe_allow_html=True)
 
-<script>
-  const USERS = {
-    student1: { password: 'pass123',   name: 'John Doe',       role: 'student' },
-    teacher1: { password: 'teach123',  name: 'Ms. Smith',      role: 'teacher' },
-    parent1:  { password: 'parent123', name: 'Robert Johnson', role: 'parent'  },
-    parent2:  { password: 'mom123',    name: 'Sarah Williams', role: 'parent'  }
-  };
+        col_btn1, col_btn2 = st.columns(2)
+        with col_btn1:
+            if st.button("🔐 LOGIN", use_container_width=True, key="login_btn"):
+                if username and password:
+                    if username in users_db:
+                        if users_db[username]["password"] == password:
+                            if users_db[username]["role"] == role:
+                                login_user(username, users_db[username])
+                                st.success(f"✅ Welcome {users_db[username]['name']}!")
+                                st.rerun()
+                            else:
+                                st.error(f"❌ This account is for {users_db[username]['role']} only! Please select {users_db[username]['role']} role.")
+                        else:
+                            st.error("❌ Incorrect password!")
+                    else:
+                        st.error("❌ Username not found!")
+                else:
+                    st.warning("⚠️ Please enter username and password!")
 
-  const AUTO = {
-    student: { user: 'student1', pw: 'pass123',   emoji: '🎓',       title: 'Student Login' },
-    teacher: { user: 'teacher1', pw: 'teach123',  emoji: '👨‍🏫',  title: 'Teacher Login' },
-    parent:  { user: 'parent1',  pw: 'parent123', emoji: '👨‍👩‍👧', title: 'Parent Login'  }
-  };
+        with col_btn2:
+            if st.button("👤 GUEST MODE", use_container_width=True, key="guest_btn"):
+                st.session_state.logged_in = True
+                st.session_state.username = "guest"
+                st.session_state.user_name = "Guest User"
+                st.session_state.user_role = "guest"
+                st.session_state.user_email = "guest@temp.com"
+                st.session_state.login_time = datetime.now()
+                st.success("✅ Logged in as Guest!")
+                st.rerun()
 
-  let currentRole = 'student';
-  let pwVisible   = false;
+        st.markdown("</div>", unsafe_allow_html=True)
 
-  function selectRole(role, btn) {
-    currentRole = role;
-    document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("📝 CREATE NEW ACCOUNT", use_container_width=True):
+        st.session_state.show_register = True
+        st.rerun()
 
-    const d = AUTO[role];
-    document.getElementById('selectedBadge').textContent  = '✓ SELECTED: ' + role.toUpperCase();
-    document.getElementById('cardTitle').textContent       = d.emoji + ' ' + d.title;
-    document.getElementById('usernameInput').value         = d.user;
-    document.getElementById('passwordInput').value         = d.pw;
-    document.getElementById('autofillNote').textContent    =
-      '✅ Credentials auto-filled for ' + role.charAt(0).toUpperCase() + role.slice(1);
-    document.getElementById('msgBox').innerHTML = '';
 
-    // Reset password visibility
-    pwVisible = false;
-    document.getElementById('passwordInput').type = 'password';
-  }
+# =========================
+# DARK/LIGHT MODE STATE
+# =========================
+if "theme_mode" not in st.session_state:
+    st.session_state.theme_mode = "dark"
 
-  function togglePw() {
-    const inp = document.getElementById('passwordInput');
-    pwVisible = !pwVisible;
-    inp.type  = pwVisible ? 'text' : 'password';
-  }
 
-  function doLogin() {
-    const u   = document.getElementById('usernameInput').value.trim();
-    const p   = document.getElementById('passwordInput').value;
-    const box = document.getElementById('msgBox');
+# =========================
+# MAIN APP
+# =========================
+def main_app():
 
-    if (!u || !p) {
-      box.innerHTML = '<div class="error-msg">⚠️ Please enter username and password!</div>';
-      return;
+    sidebar_css = """
+    <style>
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #0F2027 0%, #203A43 100%);
     }
-    if (!USERS[u]) {
-      box.innerHTML = '<div class="error-msg">❌ Username not found!</div>';
-      return;
+    [data-testid="stSidebar"] .stMarkdown,
+    [data-testid="stSidebar"] p,
+    [data-testid="stSidebar"] div,
+    [data-testid="stSidebar"] span,
+    [data-testid="stSidebar"] label {
+        color: #ffffff !important;
     }
-    if (USERS[u].password !== p) {
-      box.innerHTML = '<div class="error-msg">❌ Incorrect password!</div>';
-      return;
+    [data-testid="stSidebar"] .stButton button {
+        background: linear-gradient(to right, #00C9FF, #92FE9D);
+        color: black !important;
     }
-    if (USERS[u].role !== currentRole) {
-      box.innerHTML = `<div class="error-msg">❌ This account is for "${USERS[u].role}" role only!</div>`;
-      return;
+    </style>
+    """
+    st.markdown(sidebar_css, unsafe_allow_html=True)
+
+    with st.sidebar:
+        st.markdown("---")
+        st.markdown("### 👤 User Profile")
+        st.markdown(f"**Name:** {st.session_state.user_name}")
+        st.markdown(f"**Role:** {st.session_state.user_role.title()}")
+        st.markdown(f"**Username:** {st.session_state.username}")
+
+        if st.session_state.user_role == "parent" and "child_name" in st.session_state:
+            st.markdown(f"**Child Name:** {st.session_state.child_name}")
+
+        if st.session_state.login_time:
+            st.markdown(f"**Login Time:** {st.session_state.login_time.strftime('%H:%M:%S')}")
+        st.markdown("---")
+
+        if st.button("🚪 Logout", use_container_width=True):
+            logout_user()
+            st.rerun()
+
+        st.markdown("---")
+        st.markdown("### 📊 Quick Stats")
+        st.markdown("""
+        - Predict exam score
+        - Get insights
+        - Track progress
+        - Download reports
+        """)
+
+        st.markdown("---")
+        st.markdown("### 📞 Support")
+        st.markdown("Email: support@scorepredictor.com")
+
+    col_theme1, col_theme2 = st.columns(2)
+    with col_theme1:
+        if st.button("🌙 Dark Mode", use_container_width=True):
+            st.session_state.theme_mode = "dark"
+            st.rerun()
+    with col_theme2:
+        if st.button("☀️ Light Mode", use_container_width=True):
+            st.session_state.theme_mode = "light"
+            st.rerun()
+
+    if st.session_state.user_role == "parent":
+        st.markdown(f"### 👋 Welcome, {st.session_state.user_name}!")
+        st.markdown(f"Track and predict **{st.session_state.child_name}'s** exam performance.")
+        st.info("💡 **Parent Tip:** Regular parental involvement can improve academic performance by up to 30%!")
+    else:
+        st.markdown(f"### 👋 Welcome, {st.session_state.user_name}!")
+        st.markdown("Fill the details below to predict exam performance.")
+
+    if st.session_state.theme_mode == "dark":
+        main_css = """
+        <style>
+        .stApp {
+            background: linear-gradient(to right, #0F2027, #203A43, #2C5364);
+        }
+        label { color: white !important; }
+        .stNumberInput input {
+            background-color: #111111 !important;
+            color: white !important;
+            border: 1px solid #00FFD1;
+        }
+        div[data-baseweb="select"] > div {
+            background-color: #111111 !important;
+            color: white !important;
+        }
+        .insight-card {
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #00FFD1;
+        }
+        </style>
+        """
+    else:
+        main_css = """
+        <style>
+        .stApp {
+            background: linear-gradient(to right, #f5f7fa, #c3cfe2);
+        }
+        .insight-card {
+            background: rgba(15,52,96,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #0f3460;
+        }
+        </style>
+        """
+    st.markdown(main_css, unsafe_allow_html=True)
+
+    # Load model
+    try:
+        model = joblib.load("student_model.pkl")
+        columns = joblib.load("model_columns.pkl")
+    except FileNotFoundError:
+        st.error("❌ Model files not found! Please make sure 'student_model.pkl' and 'model_columns.pkl' exist.")
+        st.stop()
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        hours      = st.number_input("📚 Hours Studied",    min_value=0.0, max_value=24.0,  step=0.5, value=5.0)
+        attendance = st.number_input("📋 Attendance (%)",   min_value=0.0, max_value=100.0, step=1.0, value=75.0)
+        previous   = st.number_input("📈 Previous Score",   min_value=0.0, max_value=100.0, step=1.0, value=65.0)
+        sleep      = st.number_input("😴 Sleep Hours",      min_value=0.0, max_value=12.0,  step=0.5, value=7.0)
+
+    with col2:
+        motivation = st.selectbox("💪 Motivation Level",   ["Low", "Medium", "High"])
+        teacher    = st.selectbox("👨‍🏫 Teacher Quality", ["Poor", "Average", "Good"])
+        school     = st.selectbox("🏫 School Type",        ["Public", "Private"])
+        internet   = st.selectbox("🌐 Internet Access",    ["Yes", "No"])
+
+    col3, col4 = st.columns(2)
+
+    with col3:
+        income     = st.selectbox("💰 Family Income",           ["Low", "Medium", "High"])
+        parent     = st.selectbox("👪 Parental Involvement",    ["Low", "Medium", "High"])
+        education  = st.selectbox("🎓 Parent Education",        ["School", "College"])
+
+    with col4:
+        peer       = st.selectbox("👥 Peer Influence",          ["Negative", "Neutral", "Positive"])
+        resources  = st.selectbox("📚 Learning Resources",      ["Low", "Medium", "High"])
+        activities = st.selectbox("⚽ Extracurricular Activities", ["Yes", "No"])
+
+    if st.button("🔮 Predict Score", use_container_width=True):
+
+        data = {
+            "Hours_Studied": hours,
+            "Attendance": attendance,
+            "Previous_Scores": previous,
+            "Sleep_Hours": sleep,
+            "Motivation_Level": motivation,
+            "Teacher_Quality": teacher,
+            "School_Type": school,
+            "Internet_Access": internet,
+            "Family_Income": income,
+            "Parental_Involvement": parent,
+            "Parental_Education_Level": education,
+            "Peer_Influence": peer,
+            "Learning_Resources": resources,
+            "Extracurricular_Activities": activities
+        }
+
+        input_df = pd.DataFrame([data])
+        input_df = pd.get_dummies(input_df)
+        input_df = input_df.reindex(columns=columns, fill_value=0)
+
+        prediction  = model.predict(input_df)[0]
+        final_score = max(0, min(100, prediction))
+        final_score = int(round(final_score))
+
+        if final_score >= 90:
+            grade, grade_color, grade_message = "A+", "#FFD700", "🏆 Outstanding! Keep up the excellent work!"
+        elif final_score >= 80:
+            grade, grade_color, grade_message = "A",  "#92FE9D", "🎉 Excellent! You're doing great!"
+        elif final_score >= 70:
+            grade, grade_color, grade_message = "B",  "#64E986", "👍 Good job! A little more effort for an A!"
+        elif final_score >= 60:
+            grade, grade_color, grade_message = "C",  "#FFD700", "📚 Not bad! Focus on weaker areas to improve."
+        elif final_score >= 50:
+            grade, grade_color, grade_message = "D",  "#FFA500", "⚠️ Needs improvement. Consider studying harder."
+        else:
+            grade, grade_color, grade_message = "F",  "#FF6B6B", "❌ Failing. Immediate action required!"
+
+        result_html = f"""
+        <div style='background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 40px 30px;
+                    border-radius: 25px; text-align: center; margin: 30px 0; border: 1px solid #00FFD1;'>
+            <h3 style='color: #00FFD1;'>📊 PREDICTED EXAM SCORE</h3>
+            <h1 style='color: white; font-size: 70px;'>{final_score}<span style='font-size: 28px; color: #bbb;'>/100</span></h1>
+            <div style='background: {grade_color}; display: inline-block; padding: 10px 25px; border-radius: 50px;'>
+                <h3 style='color: black;'>📘 Grade : {grade}</h3>
+            </div>
+            <p style='color: #ccc; margin-top: 20px;'>{grade_message}</p>
+        </div>
+        """
+        st.markdown(result_html, unsafe_allow_html=True)
+
+        st.subheader("📈 Score Progress")
+        st.progress(final_score / 100)
+
+        chart_col1, chart_col2 = st.columns(2)
+
+        with chart_col1:
+            fig, ax = plt.subplots(figsize=(5, 5))
+            ax.pie([final_score, 100 - final_score],
+                   labels=["Your Score", "Remaining"],
+                   autopct='%1.1f%%',
+                   colors=["#00FFD1", "#2C5364"],
+                   wedgeprops=dict(width=0.4))
+            ax.set_title("Score Distribution", color='white', pad=20)
+            st.pyplot(fig)
+
+        with chart_col2:
+            fig2, ax2 = plt.subplots(figsize=(5, 5))
+            ax2.bar(['Your Score', 'Class Average', 'Target Score'],
+                    [final_score, 65, 85],
+                    color=['#00FFD1', '#FFA500', '#FF6B6B'])
+            ax2.set_ylim(0, 100)
+            ax2.set_ylabel('Score')
+            ax2.set_title('Performance Comparison')
+            ax2.tick_params(colors='white')
+            for spine in ax2.spines.values():
+                spine.set_color('white')
+            ax2.yaxis.label.set_color('white')
+            ax2.title.set_color('white')
+            for lbl in ax2.get_xticklabels():
+                lbl.set_color('white')
+            st.pyplot(fig2)
+
+        st.subheader("💡 Insights")
+        st.info(f"📊 Score Analysis: {grade_message}")
+        st.info(f"⏰ Study Pattern: You studied {hours} hours. {'Great consistency! 🌟' if hours >= 6 else 'Try to increase study time to 6+ hours 📚'}")
+        st.info(f"📋 Attendance: {attendance}% - {'Excellent! 👏' if attendance >= 85 else 'Higher attendance = better scores 🎯'}")
+        st.info(f"😴 Sleep: {sleep} hours - {'Perfect! 🧠' if sleep >= 7 else 'Try 7-8 hours of sleep 😊'}")
+
+        st.subheader("📌 Improvement Tips")
+        tips = []
+        if final_score < 60:    tips.append("🎯 Increase study hours to at least 6 hours daily")
+        if attendance < 75:     tips.append("🎯 Improve attendance to 85% or higher")
+        if motivation != "High":tips.append("🎯 Set clear academic goals")
+        if sleep < 7:           tips.append("🎯 Get 7-8 hours of sleep")
+
+        if tips:
+            for tip in tips:
+                st.info(tip)
+        else:
+            st.success("🎉 Great work! Keep it up!")
+
+        report = f"""
+STUDENT SCORE REPORT
+-------------------
+User:  {st.session_state.user_name}
+Role:  {st.session_state.user_role}
+Score: {final_score}/100
+Grade: {grade}
+        """
+        st.download_button("📥 Download Report", report, file_name=f"report_{final_score}.txt")
+
+
+# =========================
+# REGISTRATION PAGE
+# =========================
+def show_register_page():
+    st.markdown("""
+    <style>
+    .stApp {
+        background: linear-gradient(135deg, #0F2027 0%, #203A43 100%) !important;
     }
-    box.innerHTML = `<div class="success-msg">✅ Welcome, ${USERS[u].name}! Redirecting...</div>`;
-  }
+    label, p, div { color: white !important; }
+    .stTextInput input {
+        background-color: #1a1a2e !important;
+        color: white !important;
+        border: 1px solid #00FFD1 !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-  function doGuest() {
-    document.getElementById('msgBox').innerHTML =
-      '<div class="success-msg">✅ Logged in as Guest User!</div>';
-  }
+    st.markdown("<h1 style='text-align: center; color: #00FFD1;'>📝 Create Account</h1>", unsafe_allow_html=True)
 
-  function showCreate() {
-    document.getElementById('msgBox').innerHTML =
-      '<div class="success-msg">📝 Registration form would open here.</div>';
-  }
-</script>
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        new_username = st.text_input("Username")
+        new_password = st.text_input("Password", type="password")
+        confirm      = st.text_input("Confirm Password", type="password")
+        full_name    = st.text_input("Full Name")
+        email        = st.text_input("Email")
+        role         = st.selectbox("Role", ["student", "teacher", "parent"])
 
-</body>
-</html>
+        child_name = None
+        if role == "parent":
+            child_name = st.text_input("Child's Name")
+
+        col_btn1, col_btn2 = st.columns(2)
+        with col_btn1:
+            if st.button("✅ Register"):
+                if new_username and new_password and full_name:
+                    if new_password == confirm:
+                        if new_username not in users_db:
+                            users_db[new_username] = {
+                                "password": new_password,
+                                "name": full_name,
+                                "role": role,
+                                "email": email
+                            }
+                            if child_name:
+                                users_db[new_username]["child_name"] = child_name
+                            st.success("✅ Registration successful! Please login.")
+                            st.session_state.show_register = False
+                            st.rerun()
+                        else:
+                            st.error("Username exists!")
+                    else:
+                        st.error("Passwords don't match!")
+                else:
+                    st.warning("Fill all fields!")
+
+        with col_btn2:
+            if st.button("🔙 Back"):
+                st.session_state.show_register = False
+                st.rerun()
+
+
+# =========================
+# APP ROUTING
+# =========================
+if "show_register" not in st.session_state:
+    st.session_state.show_register = False
+
+if not check_login_status():
+    if st.session_state.show_register:
+        show_register_page()
+    else:
+        show_login_page()
+else:
+    main_app()
