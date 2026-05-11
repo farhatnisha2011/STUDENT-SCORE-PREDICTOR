@@ -3,8 +3,6 @@ import joblib
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
-import plotly.express as px
-import plotly.graph_objects as go
 
 # =========================
 # PAGE CONFIG
@@ -173,19 +171,32 @@ def show_admin_page():
         st.markdown("---")
         st.subheader("📊 User Distribution")
         
-        # Pie chart for user distribution
-        fig = go.Figure(data=[go.Pie(
-            labels=['Students', 'Teachers', 'Parents'],
-            values=[total_students, total_teachers, total_parents],
-            hole=.3,
-            marker_colors=['#00FFD1', '#92FE9D', '#FFD700']
-        )])
-        fig.update_layout(
-            paper_bgcolor='rgba(0,0,0,0)',
-            font_color='white',
-            title_font_color='white'
-        )
-        st.plotly_chart(fig, use_container_width=True)
+        # Pie chart for user distribution using matplotlib
+        fig1, ax1 = plt.subplots(figsize=(8, 6))
+        labels = ['Students', 'Teachers', 'Parents']
+        sizes = [total_students, total_teachers, total_parents]
+        colors = ['#00FFD1', '#92FE9D', '#FFD700']
+        ax1.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=90)
+        ax1.set_title('User Distribution by Role', color='white', pad=20)
+        ax1.set_facecolor('none')
+        fig1.patch.set_alpha(0)
+        st.pyplot(fig1)
+        
+        # User growth chart
+        st.markdown("### User Growth Over Time")
+        dates = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        growth_data = [5, 8, 12, 15, 18, 22, 25, 28, 30, 32, 35, 38]
+        
+        fig2, ax2 = plt.subplots(figsize=(10, 5))
+        ax2.plot(dates, growth_data, marker='o', color='#00FFD1', linewidth=2, markersize=8)
+        ax2.set_title('Monthly User Registrations', color='white', fontsize=14)
+        ax2.set_xlabel('Month', color='white')
+        ax2.set_ylabel('New Users', color='white')
+        ax2.tick_params(colors='white')
+        ax2.grid(True, alpha=0.3)
+        ax2.set_facecolor('none')
+        fig2.patch.set_alpha(0)
+        st.pyplot(fig2)
     
     # Tab 2: User Management
     with tab2:
@@ -290,40 +301,37 @@ def show_admin_page():
     with tab3:
         st.subheader("📈 System Analytics")
         
-        # User growth chart
-        st.markdown("### User Growth Over Time")
-        # Sample data - in real app, this would come from database
-        dates = pd.date_range(start='2024-01-01', periods=12, freq='M')
-        growth_data = pd.DataFrame({
-            'Date': dates,
-            'New Users': [5, 8, 12, 15, 18, 22, 25, 28, 30, 32, 35, 38]
-        })
-        
-        fig = px.line(growth_data, x='Date', y='New Users', title='Monthly User Registrations')
-        fig.update_layout(
-            paper_bgcolor='rgba(0,0,0,0)',
-            font_color='white',
-            title_font_color='white'
-        )
-        st.plotly_chart(fig, use_container_width=True)
-        
         # Performance metrics
-        col1, col2 = st.columns(2)
+        col1, col2, col3 = st.columns(3)
         with col1:
-            st.markdown("### Most Active Roles")
-            role_activity = pd.DataFrame({
-                'Role': ['Students', 'Teachers', 'Parents'],
-                'Activities': [234, 156, 89]
-            })
-            fig = px.bar(role_activity, x='Role', y='Activities', title='Activity by Role')
-            fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', font_color='white')
-            st.plotly_chart(fig, use_container_width=True)
-        
-        with col2:
-            st.markdown("### Prediction Accuracy")
             st.metric("Model Accuracy", "87.5%", "+2.3%")
+        with col2:
             st.metric("Total Predictions", "1,234", "+156")
+        with col3:
             st.metric("Avg Score Improvement", "15.6%", "+3.2%")
+        
+        st.markdown("---")
+        
+        # Activity chart
+        st.markdown("### User Activity by Role")
+        roles = ['Students', 'Teachers', 'Parents']
+        activities = [234, 156, 89]
+        
+        fig3, ax3 = plt.subplots(figsize=(8, 5))
+        bars = ax3.bar(roles, activities, color=['#00FFD1', '#92FE9D', '#FFD700'])
+        ax3.set_title('Activity by Role', color='white', fontsize=14)
+        ax3.set_ylabel('Number of Activities', color='white')
+        ax3.tick_params(colors='white')
+        ax3.set_facecolor('none')
+        fig3.patch.set_alpha(0)
+        
+        # Add value labels on bars
+        for bar in bars:
+            height = bar.get_height()
+            ax3.text(bar.get_x() + bar.get_width()/2., height, f'{int(height)}', 
+                    ha='center', va='bottom', color='white')
+        
+        st.pyplot(fig3)
     
     # Tab 4: System Settings
     with tab4:
@@ -363,14 +371,19 @@ def show_admin_page():
         st.subheader("📝 Recent Activity Logs")
         
         # Sample activity logs
-        logs = [
-            {"timestamp": datetime.now(), "user": "admin", "action": "Logged in", "status": "Success"},
-            {"timestamp": datetime.now(), "user": "student1", "action": "Predicted score", "status": "Success"},
-            {"timestamp": datetime.now(), "user": "teacher1", "action": "Viewed analytics", "status": "Success"},
-            {"timestamp": datetime.now(), "user": "parent1", "action": "Checked child progress", "status": "Success"},
-        ]
+        logs_data = {
+            "Timestamp": [
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            ],
+            "User": ["admin", "student1", "teacher1", "parent1"],
+            "Action": ["Logged in", "Predicted score", "Viewed analytics", "Checked child progress"],
+            "Status": ["Success", "Success", "Success", "Success"]
+        }
         
-        log_df = pd.DataFrame(logs)
+        log_df = pd.DataFrame(logs_data)
         st.dataframe(log_df, use_container_width=True)
         
         if st.button("📥 Export Logs"):
@@ -816,18 +829,4 @@ Role: {st.session_state.user_role}
 Score: {final_score}/100
 Grade: {grade}
         """
-        st.download_button("📥 Download Report", report, file_name=f"report_{final_score}.txt")
-
-# =========================
-# APP ROUTING
-# =========================
-if "show_signup" not in st.session_state:
-    st.session_state.show_signup = False
-
-if not check_login_status():
-    if st.session_state.show_signup:
-        show_signup_page()
-    else:
-        show_login_page()
-else:
-    main_app()
+       
