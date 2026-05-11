@@ -215,33 +215,6 @@ def show_login_page():
                 st.success("✅ Logged in as Guest!")
                 st.rerun()
         
-        st.markdown("<hr>", unsafe_allow_html=True)
-        
-        # Demo credentials
-        st.markdown("<p style='text-align: center; font-weight: bold; color: #00FFD1;'>📝 Demo Credentials</p>", unsafe_allow_html=True)
-        
-        if st.session_state.selected_role == "student":
-            st.markdown("""
-            <div style="background: #1a1a2e; padding: 10px; border-radius: 10px; text-align: center;">
-                <code style="color: #00FFD1; font-size: 16px;">Username: student1</code><br>
-                <code style="color: #00FFD1; font-size: 16px;">Password: pass123</code>
-            </div>
-            """, unsafe_allow_html=True)
-        elif st.session_state.selected_role == "teacher":
-            st.markdown("""
-            <div style="background: #1a1a2e; padding: 10px; border-radius: 10px; text-align: center;">
-                <code style="color: #00FFD1; font-size: 16px;">Username: teacher1</code><br>
-                <code style="color: #00FFD1; font-size: 16px;">Password: teach123</code>
-            </div>
-            """, unsafe_allow_html=True)
-        elif st.session_state.selected_role == "parent":
-            st.markdown("""
-            <div style="background: #1a1a2e; padding: 10px; border-radius: 10px; text-align: center;">
-                <code style="color: #00FFD1; font-size: 14px;">Username: parent1 | Password: parent123</code><br>
-                <code style="color: #00FFD1; font-size: 14px;">Username: parent2 | Password: mom123</code>
-            </div>
-            """, unsafe_allow_html=True)
-        
         st.markdown("</div>", unsafe_allow_html=True)
     
     # Create Account button
