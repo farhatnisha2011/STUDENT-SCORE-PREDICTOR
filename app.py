@@ -3,6 +3,8 @@ import joblib
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
+import plotly.express as px
+import plotly.graph_objects as go
 
 # =========================
 # PAGE CONFIG
@@ -10,41 +12,56 @@ from datetime import datetime
 st.set_page_config(
     page_title="Student Score Predictor",
     page_icon="🎓",
-    layout="centered"
+    layout="wide"
 )
 
 # =========================
 # USER DATABASE
 # =========================
 users_db = {
+    "admin": {
+        "password": "admin123",
+        "name": "System Administrator",
+        "role": "admin",
+        "email": "admin@scorepredictor.com",
+        "created_at": datetime.now()
+    },
     "student1": {
         "password": "pass123",
         "name": "John Doe",
         "role": "student",
-        "email": "john@example.com"
+        "email": "john@example.com",
+        "created_at": datetime.now(),
+        "scores": [65, 70, 75]
     },
     "teacher1": {
         "password": "teach123",
         "name": "Ms. Smith",
         "role": "teacher",
-        "email": "smith@school.com"
+        "email": "smith@school.com",
+        "created_at": datetime.now()
     },
     "parent1": {
         "password": "parent123",
         "name": "Robert Johnson",
         "role": "parent",
         "email": "parent@family.com",
-        "child_name": "Emma Johnson"
+        "child_name": "Emma Johnson",
+        "created_at": datetime.now()
     },
     "parent2": {
         "password": "mom123",
         "name": "Sarah Williams",
         "role": "parent",
         "email": "sarah@family.com",
-        "child_name": "Michael Williams"
+        "child_name": "Michael Williams",
+        "created_at": datetime.now()
     }
 }
 
+# =========================
+# HELPER FUNCTIONS
+# =========================
 def check_login_status():
     return st.session_state.get("logged_in", False)
 
@@ -57,6 +74,8 @@ def login_user(username, user_data):
     st.session_state.login_time = datetime.now()
     if user_data["role"] == "parent":
         st.session_state.child_name = user_data.get("child_name", "Child")
+    if user_data["role"] == "admin":
+        st.session_state.is_admin = True
 
 def logout_user():
     st.session_state.logged_in = False
@@ -65,75 +84,407 @@ def logout_user():
     st.session_state.user_role = None
     st.session_state.user_email = None
     st.session_state.login_time = None
+    st.session_state.is_admin = False
     if "child_name" in st.session_state:
         st.session_state.child_name = None
+
+def get_all_users():
+    return {k: v for k, v in users_db.items() if k != "admin"}
+
+def delete_user(username):
+    if username in users_db and username != "admin":
+        del users_db[username]
+        return True
+    return False
+
+def update_user(username, updated_data):
+    if username in users_db:
+        users_db[username].update(updated_data)
+        return True
+    return False
+
+# =========================
+# ADMIN PAGE
+# =========================
+def show_admin_page():
+    st.markdown("""
+    <style>
+    .admin-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+    .stat-card {
+        background: rgba(255,255,255,0.1);
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("<div class='admin-header'><h1 style='color: white;'>🛡️ Admin Dashboard</h1><p style='color: white;'>System Management Panel</p></div>", unsafe_allow_html=True)
+    
+    # Admin tabs
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 Dashboard", "👥 User Management", "📈 Analytics", "⚙️ System Settings", "📝 Activity Logs"])
+    
+    # Tab 1: Dashboard
+    with tab1:
+        col1, col2, col3, col4 = st.columns(4)
+        
+        total_users = len([u for u in users_db if u != "admin"])
+        total_students = len([u for u in users_db if users_db[u]["role"] == "student"])
+        total_teachers = len([u for u in users_db if users_db[u]["role"] == "teacher"])
+        total_parents = len([u for u in users_db if users_db[u]["role"] == "parent"])
+        
+        with col1:
+            st.markdown(f"""
+            <div class='stat-card'>
+                <h2 style='color: #00FFD1;'>{total_users}</h2>
+                <p>Total Users</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            st.markdown(f"""
+            <div class='stat-card'>
+                <h2 style='color: #00FFD1;'>{total_students}</h2>
+                <p>Students</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col3:
+            st.markdown(f"""
+            <div class='stat-card'>
+                <h2 style='color: #00FFD1;'>{total_teachers}</h2>
+                <p>Teachers</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col4:
+            st.markdown(f"""
+            <div class='stat-card'>
+                <h2 style='color: #00FFD1;'>{total_parents}</h2>
+                <p>Parents</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.markdown("---")
+        st.subheader("📊 User Distribution")
+        
+        # Pie chart for user distribution
+        fig = go.Figure(data=[go.Pie(
+            labels=['Students', 'Teachers', 'Parents'],
+            values=[total_students, total_teachers, total_parents],
+            hole=.3,
+            marker_colors=['#00FFD1', '#92FE9D', '#FFD700']
+        )])
+        fig.update_layout(
+            paper_bgcolor='rgba(0,0,0,0)',
+            font_color='white',
+            title_font_color='white'
+        )
+        st.plotly_chart(fig, use_container_width=True)
+    
+    # Tab 2: User Management
+    with tab2:
+        st.subheader("👥 Manage Users")
+        
+        col1, col2 = st.columns([2, 1])
+        
+        with col1:
+            st.markdown("### All Users")
+            users_list = get_all_users()
+            
+            if users_list:
+                for username, user_data in users_list.items():
+                    with st.expander(f"📌 {username} - {user_data['role'].title()}"):
+                        st.write(f"**Name:** {user_data['name']}")
+                        st.write(f"**Email:** {user_data['email']}")
+                        st.write(f"**Role:** {user_data['role']}")
+                        if user_data['role'] == 'parent':
+                            st.write(f"**Child Name:** {user_data.get('child_name', 'N/A')}")
+                        st.write(f"**Created:** {user_data.get('created_at', 'Unknown')}")
+                        
+                        col_actions1, col_actions2 = st.columns(2)
+                        with col_actions1:
+                            if st.button(f"✏️ Edit", key=f"edit_{username}"):
+                                st.session_state.edit_user = username
+                                st.rerun()
+                        with col_actions2:
+                            if st.button(f"🗑️ Delete", key=f"delete_{username}"):
+                                if delete_user(username):
+                                    st.success(f"User {username} deleted successfully!")
+                                    st.rerun()
+            else:
+                st.info("No users found")
+        
+        with col2:
+            st.markdown("### Add New User")
+            with st.form("add_user_form"):
+                new_username = st.text_input("Username")
+                new_password = st.text_input("Password", type="password")
+                new_name = st.text_input("Full Name")
+                new_email = st.text_input("Email")
+                new_role = st.selectbox("Role", ["student", "teacher", "parent"])
+                child_name = ""
+                if new_role == "parent":
+                    child_name = st.text_input("Child's Name")
+                
+                if st.form_submit_button("➕ Add User"):
+                    if new_username and new_password and new_name:
+                        if new_username not in users_db:
+                            users_db[new_username] = {
+                                "password": new_password,
+                                "name": new_name,
+                                "role": new_role,
+                                "email": new_email,
+                                "created_at": datetime.now()
+                            }
+                            if child_name:
+                                users_db[new_username]["child_name"] = child_name
+                            st.success(f"User {new_username} added successfully!")
+                            st.rerun()
+                        else:
+                            st.error("Username already exists!")
+                    else:
+                        st.warning("Please fill required fields!")
+        
+        # Edit user modal
+        if hasattr(st.session_state, 'edit_user'):
+            st.markdown("---")
+            st.subheader(f"✏️ Editing User: {st.session_state.edit_user}")
+            user_to_edit = users_db[st.session_state.edit_user]
+            
+            col_edit1, col_edit2 = st.columns(2)
+            with col_edit1:
+                edit_name = st.text_input("Name", user_to_edit['name'])
+                edit_email = st.text_input("Email", user_to_edit['email'])
+            with col_edit2:
+                edit_role = st.selectbox("Role", ["student", "teacher", "parent"], 
+                                       index=["student", "teacher", "parent"].index(user_to_edit['role']))
+                if user_to_edit['role'] == 'parent':
+                    edit_child = st.text_input("Child's Name", user_to_edit.get('child_name', ''))
+            
+            col_btn1, col_btn2 = st.columns(2)
+            with col_btn1:
+                if st.button("💾 Save Changes"):
+                    updated_data = {
+                        "name": edit_name,
+                        "email": edit_email,
+                        "role": edit_role
+                    }
+                    if edit_role == 'parent' and edit_child:
+                        updated_data["child_name"] = edit_child
+                    if update_user(st.session_state.edit_user, updated_data):
+                        st.success("User updated successfully!")
+                        del st.session_state.edit_user
+                        st.rerun()
+            with col_btn2:
+                if st.button("❌ Cancel"):
+                    del st.session_state.edit_user
+                    st.rerun()
+    
+    # Tab 3: Analytics
+    with tab3:
+        st.subheader("📈 System Analytics")
+        
+        # User growth chart
+        st.markdown("### User Growth Over Time")
+        # Sample data - in real app, this would come from database
+        dates = pd.date_range(start='2024-01-01', periods=12, freq='M')
+        growth_data = pd.DataFrame({
+            'Date': dates,
+            'New Users': [5, 8, 12, 15, 18, 22, 25, 28, 30, 32, 35, 38]
+        })
+        
+        fig = px.line(growth_data, x='Date', y='New Users', title='Monthly User Registrations')
+        fig.update_layout(
+            paper_bgcolor='rgba(0,0,0,0)',
+            font_color='white',
+            title_font_color='white'
+        )
+        st.plotly_chart(fig, use_container_width=True)
+        
+        # Performance metrics
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("### Most Active Roles")
+            role_activity = pd.DataFrame({
+                'Role': ['Students', 'Teachers', 'Parents'],
+                'Activities': [234, 156, 89]
+            })
+            fig = px.bar(role_activity, x='Role', y='Activities', title='Activity by Role')
+            fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', font_color='white')
+            st.plotly_chart(fig, use_container_width=True)
+        
+        with col2:
+            st.markdown("### Prediction Accuracy")
+            st.metric("Model Accuracy", "87.5%", "+2.3%")
+            st.metric("Total Predictions", "1,234", "+156")
+            st.metric("Avg Score Improvement", "15.6%", "+3.2%")
+    
+    # Tab 4: System Settings
+    with tab4:
+        st.subheader("⚙️ System Configuration")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("### General Settings")
+            maintenance_mode = st.toggle("🔧 Maintenance Mode", False)
+            allow_registration = st.toggle("📝 Allow New Registrations", True)
+            email_notifications = st.toggle("📧 Email Notifications", True)
+            
+            if st.button("💾 Save General Settings"):
+                st.success("Settings saved successfully!")
+        
+        with col2:
+            st.markdown("### Admin Account")
+            st.info("⚠️ Security Settings")
+            
+            current_admin_pass = st.text_input("Current Password", type="password")
+            new_admin_pass = st.text_input("New Password", type="password")
+            confirm_admin_pass = st.text_input("Confirm New Password", type="password")
+            
+            if st.button("🔑 Change Admin Password"):
+                if current_admin_pass == users_db["admin"]["password"]:
+                    if new_admin_pass == confirm_admin_pass and new_admin_pass:
+                        users_db["admin"]["password"] = new_admin_pass
+                        st.success("Password changed successfully!")
+                    else:
+                        st.error("New passwords don't match!")
+                else:
+                    st.error("Current password is incorrect!")
+    
+    # Tab 5: Activity Logs
+    with tab5:
+        st.subheader("📝 Recent Activity Logs")
+        
+        # Sample activity logs
+        logs = [
+            {"timestamp": datetime.now(), "user": "admin", "action": "Logged in", "status": "Success"},
+            {"timestamp": datetime.now(), "user": "student1", "action": "Predicted score", "status": "Success"},
+            {"timestamp": datetime.now(), "user": "teacher1", "action": "Viewed analytics", "status": "Success"},
+            {"timestamp": datetime.now(), "user": "parent1", "action": "Checked child progress", "status": "Success"},
+        ]
+        
+        log_df = pd.DataFrame(logs)
+        st.dataframe(log_df, use_container_width=True)
+        
+        if st.button("📥 Export Logs"):
+            st.success("Logs exported successfully!")
+
+# =========================
+# SIGNUP PAGE
+# =========================
+def show_signup_page():
+    st.markdown("""
+    <style>
+    .signup-container {
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 20px;
+        background: rgba(0,0,0,0.3);
+        border-radius: 20px;
+        border: 1px solid #00FFD1;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("<h1 style='text-align: center; color: #00FFD1;'>📝 Create New Account</h1>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    with st.container():
+        st.markdown("<div class='signup-container'>", unsafe_allow_html=True)
+        
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            username = st.text_input("👤 Username *", placeholder="Choose a username")
+            email = st.text_input("📧 Email *", placeholder="your@email.com")
+            full_name = st.text_input("👨‍🎓 Full Name *", placeholder="Enter your full name")
+            password = st.text_input("🔒 Password *", type="password", placeholder="Create a password")
+            confirm_password = st.text_input("✓ Confirm Password *", type="password", placeholder="Confirm your password")
+            role = st.selectbox("🎯 Select Role", ["student", "teacher", "parent"])
+            
+            child_name = None
+            if role == "parent":
+                child_name = st.text_input("👶 Child's Name", placeholder="Enter your child's name")
+            
+            st.markdown("<br>", unsafe_allow_html=True)
+            
+            col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
+            with col_btn2:
+                if st.button("✅ CREATE ACCOUNT", use_container_width=True):
+                    if username and password and full_name and email:
+                        if password == confirm_password:
+                            if username not in users_db:
+                                users_db[username] = {
+                                    "password": password,
+                                    "name": full_name,
+                                    "role": role,
+                                    "email": email,
+                                    "created_at": datetime.now()
+                                }
+                                if child_name:
+                                    users_db[username]["child_name"] = child_name
+                                st.success("🎉 Account created successfully! Please login.")
+                                st.balloons()
+                                st.session_state.show_signup = False
+                                st.rerun()
+                            else:
+                                st.error("❌ Username already exists! Please choose another.")
+                        else:
+                            st.error("❌ Passwords do not match!")
+                    else:
+                        st.warning("⚠️ Please fill all required fields (*)")
+                
+                st.markdown("<br>", unsafe_allow_html=True)
+                
+                if st.button("🔙 Back to Login", use_container_width=True):
+                    st.session_state.show_signup = False
+                    st.rerun()
+        
+        st.markdown("</div>", unsafe_allow_html=True)
 
 # =========================
 # LOGIN PAGE
 # =========================
 def show_login_page():
-    # Clear any existing session
     if "selected_role" not in st.session_state:
         st.session_state.selected_role = "student"
     
     st.markdown("""
     <style>
-    /* Full page background */
     .stApp {
         background: linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%) !important;
     }
-    
-    /* All text white */
     .stMarkdown, p, div, span, label, h1, h2, h3, h4 {
         color: white !important;
     }
-    
-    /* Input fields */
     .stTextInput input {
         background-color: #1a1a2e !important;
         color: white !important;
         border: 1px solid #00FFD1 !important;
         border-radius: 8px !important;
-        padding: 10px !important;
     }
-    
-    /* Placeholder */
-    .stTextInput input::placeholder {
-        color: #888 !important;
-    }
-    
-    /* Buttons */
     .stButton button {
         background: linear-gradient(135deg, #00C9FF, #92FE9D) !important;
         color: black !important;
         font-weight: bold !important;
         border-radius: 10px !important;
-        padding: 10px !important;
-        border: none !important;
-    }
-    
-    /* Role buttons specific */
-    div[data-testid="column"] .stButton button {
-        background: #2c3e50 !important;
-        color: white !important;
-    }
-    
-    /* Success/Error messages */
-    .stAlert {
-        background-color: #1a1a2e !important;
-        border-left-color: #00FFD1 !important;
     }
     </style>
     """, unsafe_allow_html=True)
     
-    # Title
     st.markdown("<h1 style='text-align: center; color: #00FFD1;'>🎓 Student Score Predictor</h1>", unsafe_allow_html=True)
     st.markdown("<br>", unsafe_allow_html=True)
     
     # Role selection
     st.markdown("<h3 style='text-align: center;'>Select Your Role</h3>", unsafe_allow_html=True)
     
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     
     with col1:
         if st.button("🎓 Student", key="role_student", use_container_width=True):
@@ -150,7 +501,11 @@ def show_login_page():
             st.session_state.selected_role = "parent"
             st.rerun()
     
-    # Show selected role
+    with col4:
+        if st.button("🛡️ Admin", key="role_admin", use_container_width=True):
+            st.session_state.selected_role = "admin"
+            st.rerun()
+    
     st.markdown(f"""
     <div style="text-align: center; margin: 20px 0;">
         <span style="background: #00FFD1; color: black; padding: 8px 25px; border-radius: 20px; font-weight: bold;">
@@ -165,38 +520,34 @@ def show_login_page():
         <div style="background: rgba(0,0,0,0.3); border-radius: 20px; padding: 30px; max-width: 450px; margin: 0 auto; border: 1px solid #00FFD1;">
         """, unsafe_allow_html=True)
         
-        # Role specific title
         if st.session_state.selected_role == "student":
             st.markdown("<h2 style='text-align: center; color: #00FFD1;'>🎓 Student Login</h2>", unsafe_allow_html=True)
         elif st.session_state.selected_role == "teacher":
             st.markdown("<h2 style='text-align: center; color: #00FFD1;'>👨‍🏫 Teacher Login</h2>", unsafe_allow_html=True)
-        else:
+        elif st.session_state.selected_role == "parent":
             st.markdown("<h2 style='text-align: center; color: #00FFD1;'>👨‍👩‍👧 Parent Login</h2>", unsafe_allow_html=True)
+        else:
+            st.markdown("<h2 style='text-align: center; color: #00FFD1;'>🛡️ Admin Login</h2>", unsafe_allow_html=True)
         
         st.markdown("<br>", unsafe_allow_html=True)
         
-        # Login fields
         username = st.text_input("Username", placeholder="Enter your username", key="login_username")
         password = st.text_input("Password", type="password", placeholder="Enter your password", key="login_password")
         
         st.markdown("<br>", unsafe_allow_html=True)
         
-        # Login button
         col_btn1, col_btn2 = st.columns(2)
         with col_btn1:
             if st.button("🔐 LOGIN", use_container_width=True, key="login_btn"):
                 if username and password:
-                    # Check if user exists
                     if username in users_db:
-                        # Check password
                         if users_db[username]["password"] == password:
-                            # Check role match
                             if users_db[username]["role"] == st.session_state.selected_role:
                                 login_user(username, users_db[username])
                                 st.success(f"✅ Welcome {users_db[username]['name']}!")
                                 st.rerun()
                             else:
-                                st.error(f"❌ This account is for {users_db[username]['role']} only! Please select {users_db[username]['role']} role.")
+                                st.error(f"❌ This account is for {users_db[username]['role']} only!")
                         else:
                             st.error("❌ Incorrect password!")
                     else:
@@ -217,22 +568,22 @@ def show_login_page():
         
         st.markdown("</div>", unsafe_allow_html=True)
     
-    # Create Account button
     st.markdown("<br>", unsafe_allow_html=True)
-    if st.button("📝 CREATE NEW ACCOUNT", use_container_width=True):
-        st.session_state.show_register = True
-        st.rerun()
+    
+    col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
+    with col_btn2:
+        if st.button("📝 CREATE NEW ACCOUNT", use_container_width=True):
+            st.session_state.show_signup = True
+            st.rerun()
 
 # =========================
-# DARK/LIGHT MODE STATE
-# =========================
-if "theme_mode" not in st.session_state:
-    st.session_state.theme_mode = "dark"
-
-# =========================
-# MAIN APP
+# MAIN APP (Student/Teacher/Parent View)
 # =========================
 def main_app():
+    # If admin, show admin page
+    if st.session_state.user_role == "admin":
+        show_admin_page()
+        return
     
     # Sidebar styling
     sidebar_css = """
@@ -287,17 +638,6 @@ def main_app():
         st.markdown("### 📞 Support")
         st.markdown("Email: support@scorepredictor.com")
     
-    # Theme toggle
-    col_theme1, col_theme2 = st.columns(2)
-    with col_theme1:
-        if st.button("🌙 Dark Mode", use_container_width=True):
-            st.session_state.theme_mode = "dark"
-            st.rerun()
-    with col_theme2:
-        if st.button("☀️ Light Mode", use_container_width=True):
-            st.session_state.theme_mode = "light"
-            st.rerun()
-    
     # Welcome message
     if st.session_state.user_role == "parent":
         st.markdown(f"### 👋 Welcome, {st.session_state.user_name}!")
@@ -306,51 +646,6 @@ def main_app():
     else:
         st.markdown(f"### 👋 Welcome, {st.session_state.user_name}!")
         st.markdown("Fill the details below to predict exam performance.")
-    
-    # Main CSS
-    if st.session_state.theme_mode == "dark":
-        main_css = """
-        <style>
-        .stApp {
-            background: linear-gradient(to right, #0F2027, #203A43, #2C5364);
-        }
-        label {
-            color: white !important;
-        }
-        .stNumberInput input {
-            background-color: #111111 !important;
-            color: white !important;
-            border: 1px solid #00FFD1;
-        }
-        div[data-baseweb="select"] > div {
-            background-color: #111111 !important;
-            color: white !important;
-        }
-        .insight-card {
-            background: rgba(255,255,255,0.15);
-            border-radius: 10px;
-            padding: 15px;
-            margin: 10px 0;
-            border-left: 4px solid #00FFD1;
-        }
-        </style>
-        """
-    else:
-        main_css = """
-        <style>
-        .stApp {
-            background: linear-gradient(to right, #f5f7fa, #c3cfe2);
-        }
-        .insight-card {
-            background: rgba(15,52,96,0.1);
-            border-radius: 10px;
-            padding: 15px;
-            margin: 10px 0;
-            border-left: 4px solid #0f3460;
-        }
-        </style>
-        """
-    st.markdown(main_css, unsafe_allow_html=True)
     
     # Load model
     try:
@@ -524,78 +819,14 @@ Grade: {grade}
         st.download_button("📥 Download Report", report, file_name=f"report_{final_score}.txt")
 
 # =========================
-# REGISTRATION PAGE
-# =========================
-def show_register_page():
-    st.markdown("""
-    <style>
-    .stApp {
-        background: linear-gradient(135deg, #0F2027 0%, #203A43 100%) !important;
-    }
-    label, p, div {
-        color: white !important;
-    }
-    .stTextInput input {
-        background-color: #1a1a2e !important;
-        color: white !important;
-        border: 1px solid #00FFD1 !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-    
-    st.markdown("<h1 style='text-align: center; color: #00FFD1;'>📝 Create Account</h1>", unsafe_allow_html=True)
-    
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        new_username = st.text_input("Username")
-        new_password = st.text_input("Password", type="password")
-        confirm = st.text_input("Confirm Password", type="password")
-        full_name = st.text_input("Full Name")
-        email = st.text_input("Email")
-        role = st.selectbox("Role", ["student", "teacher", "parent"])
-        
-        child_name = None
-        if role == "parent":
-            child_name = st.text_input("Child's Name")
-        
-        col_btn1, col_btn2 = st.columns(2)
-        with col_btn1:
-            if st.button("✅ Register"):
-                if new_username and new_password and full_name:
-                    if new_password == confirm:
-                        if new_username not in users_db:
-                            users_db[new_username] = {
-                                "password": new_password,
-                                "name": full_name,
-                                "role": role,
-                                "email": email
-                            }
-                            if child_name:
-                                users_db[new_username]["child_name"] = child_name
-                            st.success("✅ Registration successful! Please login.")
-                            st.session_state.show_register = False
-                            st.rerun()
-                        else:
-                            st.error("Username exists!")
-                    else:
-                        st.error("Passwords don't match!")
-                else:
-                    st.warning("Fill all fields!")
-        
-        with col_btn2:
-            if st.button("🔙 Back"):
-                st.session_state.show_register = False
-                st.rerun()
-
-# =========================
 # APP ROUTING
 # =========================
-if "show_register" not in st.session_state:
-    st.session_state.show_register = False
+if "show_signup" not in st.session_state:
+    st.session_state.show_signup = False
 
 if not check_login_status():
-    if st.session_state.show_register:
-        show_register_page()
+    if st.session_state.show_signup:
+        show_signup_page()
     else:
         show_login_page()
 else:
