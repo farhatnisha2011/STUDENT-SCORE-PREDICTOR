@@ -9,54 +9,24 @@ import os
 # PAGE CONFIG
 # ==========================================
 st.set_page_config(
-    page_title="Student Score Predictor",
+    page_title="AI Student Performance Predictor",
     page_icon="🎓",
     layout="wide"
 )
 
 # ==========================================
-# THEME MODE
-# ==========================================
-if "theme_mode" not in st.session_state:
-    st.session_state.theme_mode = "dark"
-
-# ==========================================
-# DATABASE FILES
+# DATABASE
 # ==========================================
 USER_DB_FILE = "users.json"
 
-# ==========================================
-# DEFAULT USERS
-# ==========================================
 default_users = {
     "student1": {
         "password": "pass123",
         "name": "John Student",
         "role": "student",
         "email": "john@school.com"
-    },
-
-    "teacher1": {
-        "password": "teach123",
-        "name": "Ms. Smith",
-        "role": "teacher",
-        "email": "smith@school.com"
-    },
-
-    "parent1": {
-        "password": "parent123",
-        "name": "Robert Parent",
-        "role": "parent",
-        "email": "parent@family.com",
-        "child_name": "Emma"
     }
 }
-
-# ==========================================
-# ADMIN CREDENTIALS
-# ==========================================
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "admin123"
 
 # ==========================================
 # LOAD USERS
@@ -82,7 +52,7 @@ def save_users(users):
 users_db = load_users()
 
 # ==========================================
-# SESSION STATES
+# SESSION
 # ==========================================
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -90,162 +60,129 @@ if "logged_in" not in st.session_state:
 if "show_register" not in st.session_state:
     st.session_state.show_register = False
 
-if "is_admin" not in st.session_state:
-    st.session_state.is_admin = False
+# ==========================================
+# PREMIUM CSS
+# ==========================================
+st.markdown("""
+<style>
+
+/* Background */
+
+.stApp{
+    background:
+    linear-gradient(
+        135deg,
+        #0f172a,
+        #111827,
+        #1e293b
+    );
+}
+
+/* Hide Menu */
+
+#MainMenu{
+    visibility:hidden;
+}
+
+footer{
+    visibility:hidden;
+}
+
+/* Text */
+
+h1,h2,h3,h4,h5,h6,p,label,span{
+    color:white !important;
+}
+
+/* Inputs */
+
+.stTextInput input,
+.stNumberInput input{
+
+    background:#111827 !important;
+    color:white !important;
+
+    border:1px solid #00FFD1 !important;
+
+    border-radius:12px !important;
+}
+
+/* Selectbox */
+
+div[data-baseweb="select"]{
+
+    background:#111827 !important;
+
+    border-radius:12px !important;
+
+    border:1px solid #00FFD1 !important;
+}
+
+div[data-baseweb="select"] *{
+    color:white !important;
+    background:#111827 !important;
+}
+
+/* Button */
+
+.stButton button{
+
+    width:100%;
+
+    background:linear-gradient(
+        135deg,
+        #00C9FF,
+        #92FE9D
+    ) !important;
+
+    color:black !important;
+
+    font-weight:bold !important;
+
+    border:none !important;
+
+    border-radius:14px !important;
+
+    padding:14px !important;
+
+    transition:0.3s;
+}
+
+.stButton button:hover{
+
+    transform:scale(1.03);
+
+    box-shadow:0 0 20px #00FFD1;
+}
+
+/* Sidebar */
+
+[data-testid="stSidebar"]{
+    background:#0f172a !important;
+}
+
+/* Glass */
+
+.glass{
+
+    background:rgba(255,255,255,0.08);
+
+    backdrop-filter: blur(12px);
+
+    border-radius:20px;
+
+    padding:25px;
+
+    border:1px solid rgba(255,255,255,0.15);
+
+    box-shadow:0 8px 32px rgba(0,0,0,0.3);
+}
+
+</style>
+""", unsafe_allow_html=True)
 
 # ==========================================
-# APPLY THEME
-# ==========================================
-def apply_theme():
-
-    if st.session_state.theme_mode == "dark":
-
-        st.markdown("""
-        <style>
-
-        .stApp{
-            background: linear-gradient(
-                135deg,
-                #0F2027,
-                #203A43,
-                #2C5364
-            ) !important;
-        }
-
-        h1,h2,h3,h4,h5,h6,p,label,span{
-            color:white !important;
-        }
-
-        .stMarkdown{
-            color:white !important;
-        }
-
-        .stTextInput input,
-        .stNumberInput input{
-
-            background-color:#1a1a2e !important;
-            color:white !important;
-            border:1px solid #00FFD1 !important;
-            border-radius:8px !important;
-        }
-
-        div[data-baseweb="select"]{
-            background-color:#1a1a2e !important;
-            border:1px solid #00FFD1 !important;
-            border-radius:8px !important;
-        }
-
-        div[data-baseweb="select"] *{
-            background-color:#1a1a2e !important;
-            color:white !important;
-        }
-
-        .stButton button{
-
-            background:linear-gradient(
-                to right,
-                #00C9FF,
-                #92FE9D
-            ) !important;
-
-            color:black !important;
-            font-weight:bold !important;
-            border:none !important;
-            border-radius:10px !important;
-        }
-
-        .stButton button p{
-            color:black !important;
-        }
-
-        [data-testid="stSidebar"]{
-            background:#111827 !important;
-        }
-
-        </style>
-        """, unsafe_allow_html=True)
-
-    else:
-
-        st.markdown("""
-        <style>
-
-        .stApp{
-            background:linear-gradient(
-                135deg,
-                #f5f7fa,
-                #c3cfe2
-            ) !important;
-        }
-
-        h1,h2,h3,h4,h5,h6,p,label,span{
-            color:#111827 !important;
-        }
-
-        .stMarkdown{
-            color:#111827 !important;
-        }
-
-        .stTextInput input,
-        .stNumberInput input{
-
-            background:white !important;
-            color:black !important;
-            border:1px solid #00C9FF !important;
-            border-radius:8px !important;
-        }
-
-        div[data-baseweb="select"]{
-            background:white !important;
-            border:1px solid #00C9FF !important;
-            border-radius:8px !important;
-        }
-
-        div[data-baseweb="select"] *{
-            background:white !important;
-            color:black !important;
-        }
-
-        .stButton button{
-
-            background:linear-gradient(
-                to right,
-                #00C9FF,
-                #92FE9D
-            ) !important;
-
-            color:black !important;
-            font-weight:bold !important;
-            border:none !important;
-            border-radius:10px !important;
-        }
-
-        .stButton button p{
-            color:black !important;
-        }
-
-        [data-testid="stSidebar"]{
-            background:#e6ecf5 !important;
-        }
-
-        </style>
-        """, unsafe_allow_html=True)
-
-# ==========================================
-# TOGGLE THEME
-# ==========================================
-def toggle_theme():
-
-    if st.session_state.theme_mode == "dark":
-        st.session_state.theme_mode = "light"
-
-    else:
-        st.session_state.theme_mode = "dark"
-
-    st.rerun()
-
-# ==========================================
-# SCORE PREDICTION
+# SCORE FUNCTION
 # ==========================================
 def calculate_score(
     hours,
@@ -253,286 +190,79 @@ def calculate_score(
     previous,
     sleep,
     motivation,
-    teacher,
-    school,
-    internet,
-    income,
-    parent_involvement,
-    parent_education,
-    peer,
-    resources,
-    activities
+    internet
 ):
 
     score = 0
 
-    score += min(hours * 3.5, 25)
-    score += attendance * 0.2
-    score += previous * 0.15
-    score += min(sleep * 1.2, 10)
+    score += min(hours * 5, 30)
+    score += attendance * 0.3
+    score += previous * 0.2
+    score += sleep * 1.5
 
     motivation_map = {
-        "Low": 2,
-        "Medium": 5,
-        "High": 8
-    }
-
-    teacher_map = {
-        "Poor": 2,
-        "Average": 5,
-        "Good": 8
-    }
-
-    income_map = {
-        "Low": 2,
-        "Medium": 4,
-        "High": 7
-    }
-
-    parent_map = {
-        "Low": 2,
-        "Medium": 5,
-        "High": 8
-    }
-
-    peer_map = {
-        "Negative": 1,
-        "Neutral": 3,
-        "Positive": 6
-    }
-
-    resource_map = {
-        "Low": 2,
-        "Medium": 4,
-        "High": 7
+        "Low": 3,
+        "Medium": 6,
+        "High": 10
     }
 
     score += motivation_map[motivation]
-    score += teacher_map[teacher]
-    score += 5 if school == "Private" else 0
-    score += 5 if internet == "Yes" else 0
-    score += income_map[income]
-    score += parent_map[parent_involvement]
-    score += 5 if parent_education == "College" else 0
-    score += peer_map[peer]
-    score += resource_map[resources]
-    score += 4 if activities == "Yes" else 0
 
-    return max(0, min(100, int(round(score))))
+    if internet == "Yes":
+        score += 5
+
+    return max(0, min(100, int(score)))
 
 # ==========================================
-# LOGIN USER
+# LOGIN FUNCTION
 # ==========================================
-def login_user(username, user_data):
+def login_user(username):
 
     st.session_state.logged_in = True
     st.session_state.username = username
-    st.session_state.user_name = user_data["name"]
-    st.session_state.user_role = user_data["role"]
-    st.session_state.user_email = user_data["email"]
-    st.session_state.login_time = datetime.now()
-
-    if user_data["role"] == "parent":
-
-        st.session_state.child_name = user_data.get(
-            "child_name",
-            "Child"
-        )
+    st.session_state.user_name = users_db[username]["name"]
 
 # ==========================================
 # LOGOUT
 # ==========================================
 def logout_user():
 
-    theme = st.session_state.theme_mode
-
-    st.session_state.clear()
-
-    st.session_state.theme_mode = theme
     st.session_state.logged_in = False
-    st.session_state.is_admin = False
-
     st.rerun()
-
-# ==========================================
-# ADMIN LOGIN PAGE
-# ==========================================
-def admin_login_page():
-
-    apply_theme()
-
-    st.markdown("""
-    <h1 style='text-align:center;'>
-        🛡️ Admin Login
-    </h1>
-    """, unsafe_allow_html=True)
-
-    st.markdown("---")
-
-    admin_user = st.text_input("Admin Username")
-    admin_pass = st.text_input(
-        "Admin Password",
-        type="password"
-    )
-
-    if st.button(
-        "🔐 Admin Login",
-        use_container_width=True
-    ):
-
-        if (
-            admin_user == ADMIN_USERNAME
-            and
-            admin_pass == ADMIN_PASSWORD
-        ):
-
-            st.session_state.logged_in = True
-            st.session_state.is_admin = True
-            st.session_state.user_name = "Administrator"
-
-            st.success("Admin Login Successful")
-
-            st.rerun()
-
-        else:
-
-            st.error("Invalid Admin Credentials")
-
-    if st.button(
-        "🔙 Back",
-        use_container_width=True
-    ):
-
-        st.session_state.admin_page = False
-        st.rerun()
-
-# ==========================================
-# ADMIN DASHBOARD
-# ==========================================
-def admin_dashboard():
-
-    apply_theme()
-
-    st.title("🛡️ Admin Dashboard")
-
-    st.markdown("---")
-
-    col1, col2, col3 = st.columns(3)
-
-    total_users = len(users_db)
-
-    students = len([
-        u for u in users_db
-        if users_db[u]["role"] == "student"
-    ])
-
-    teachers = len([
-        u for u in users_db
-        if users_db[u]["role"] == "teacher"
-    ])
-
-    col1.metric("Total Users", total_users)
-    col2.metric("Students", students)
-    col3.metric("Teachers", teachers)
-
-    st.markdown("---")
-
-    st.subheader("👥 All Registered Users")
-
-    for username, data in users_db.items():
-
-        with st.expander(f"{username}"):
-
-            st.write(f"Name : {data['name']}")
-            st.write(f"Role : {data['role']}")
-            st.write(f"Email : {data['email']}")
-
-            if data["role"] == "parent":
-
-                st.write(
-                    f"Child : {data.get('child_name','N/A')}"
-                )
-
-            if st.button(
-                f"❌ Delete {username}",
-                key=username
-            ):
-
-                del users_db[username]
-
-                save_users(users_db)
-
-                st.success("User Deleted")
-
-                st.rerun()
-
-    st.markdown("---")
-
-    if st.button(
-        "🚪 Logout Admin",
-        use_container_width=True
-    ):
-
-        logout_user()
 
 # ==========================================
 # LOGIN PAGE
 # ==========================================
-def show_login_page():
-
-    apply_theme()
-
-    top1, top2 = st.columns([5, 1])
-
-    with top2:
-
-        if st.session_state.theme_mode == "dark":
-
-            if st.button("☀️ Light"):
-
-                toggle_theme()
-
-        else:
-
-            if st.button("🌙 Dark"):
-
-                toggle_theme()
+def show_login():
 
     st.markdown("""
     <h1 style='text-align:center;'>
-        🎓 Student Score Predictor
+    🎓 AI Student Performance Predictor
     </h1>
     """, unsafe_allow_html=True)
 
     st.markdown("---")
 
-    role = st.selectbox(
-        "Select Role",
-        ["student", "teacher", "parent"]
-    )
+    col1, col2, col3 = st.columns([1,2,1])
 
-    username = st.text_input("Username")
+    with col2:
 
-    password = st.text_input(
-        "Password",
-        type="password"
-    )
+        st.markdown("<div class='glass'>", unsafe_allow_html=True)
 
-    if st.button(
-        "🔐 Login",
-        use_container_width=True
-    ):
+        username = st.text_input("Username")
 
-        if username in users_db:
+        password = st.text_input(
+            "Password",
+            type="password"
+        )
 
-            if users_db[username]["password"] == password:
+        if st.button("🔐 Login"):
 
-                if users_db[username]["role"] == role:
+            if username in users_db:
 
-                    login_user(
-                        username,
-                        users_db[username]
-                    )
+                if users_db[username]["password"] == password:
+
+                    login_user(username)
 
                     st.success("Login Successful")
 
@@ -540,425 +270,429 @@ def show_login_page():
 
                 else:
 
-                    st.error(
-                        f"This account is for "
-                        f"{users_db[username]['role']}"
-                    )
+                    st.error("Wrong Password")
 
             else:
 
-                st.error("Wrong Password")
+                st.error("Username Not Found")
 
-        else:
-
-            st.error("Username Not Found")
-
-    st.markdown("---")
-
-    if st.button(
-        "🛡️ Admin Login",
-        use_container_width=True
-    ):
-
-        st.session_state.admin_page = True
-        st.rerun()
-
-    if st.button(
-        "📝 Create New Account",
-        use_container_width=True
-    ):
-
-        st.session_state.show_register = True
-
-        st.rerun()
-
-# ==========================================
-# REGISTER PAGE
-# ==========================================
-def show_register_page():
-
-    apply_theme()
-
-    st.title("📝 Create Account")
-
-    st.markdown("---")
-
-    username = st.text_input("Username")
-    full_name = st.text_input("Full Name")
-    email = st.text_input("Email")
-
-    password = st.text_input(
-        "Password",
-        type="password"
-    )
-
-    confirm = st.text_input(
-        "Confirm Password",
-        type="password"
-    )
-
-    role = st.selectbox(
-        "Role",
-        ["student", "teacher", "parent"]
-    )
-
-    child_name = ""
-
-    if role == "parent":
-
-        child_name = st.text_input("Child Name")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-
-        if st.button(
-            "✅ Register",
-            use_container_width=True
-        ):
-
-            if username in users_db:
-
-                st.error("Username Exists")
-
-            elif password != confirm:
-
-                st.error("Passwords do not match")
-
-            else:
-
-                users_db[username] = {
-                    "password": password,
-                    "name": full_name,
-                    "role": role,
-                    "email": email
-                }
-
-                if role == "parent":
-
-                    users_db[username]["child_name"] = child_name
-
-                save_users(users_db)
-
-                st.success("Account Created")
-
-                st.session_state.show_register = False
-
-                st.rerun()
-
-    with col2:
-
-        if st.button(
-            "🔙 Back",
-            use_container_width=True
-        ):
-
-            st.session_state.show_register = False
-
-            st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
 
 # ==========================================
 # MAIN APP
 # ==========================================
 def main_app():
 
-    apply_theme()
-
-    top1, top2, top3 = st.columns([6,1,1])
-
-    with top2:
-
-        if st.session_state.theme_mode == "dark":
-
-            if st.button("☀️"):
-
-                toggle_theme()
-
-        else:
-
-            if st.button("🌙"):
-
-                toggle_theme()
-
-    with top3:
-
-        if st.button("🚪"):
-
-            logout_user()
+    # ======================================
+    # SIDEBAR
+    # ======================================
 
     with st.sidebar:
 
-        st.title("👤 Profile")
-
-        st.write(f"Name : {st.session_state.user_name}")
-        st.write(f"Role : {st.session_state.user_role}")
-
-        st.markdown("---")
-
-        st.markdown("### 📌 Features")
-        st.markdown("- Score Prediction")
-        st.markdown("- Charts")
-        st.markdown("- Report Download")
-        st.markdown("- Theme Switcher")
-
-    st.title("🎓 Student Score Predictor")
-
-    st.info(
-        f"Welcome {st.session_state.user_name}"
-    )
-
-    st.markdown("---")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-
-        hours = st.number_input(
-            "Hours Studied",
-            0.0,
-            24.0,
-            5.0
-        )
-
-        attendance = st.number_input(
-            "Attendance %",
-            0.0,
-            100.0,
-            75.0
-        )
-
-        previous = st.number_input(
-            "Previous Score",
-            0.0,
-            100.0,
-            65.0
-        )
-
-        sleep = st.number_input(
-            "Sleep Hours",
-            0.0,
-            12.0,
-            7.0
-        )
-
-    with col2:
-
-        motivation = st.selectbox(
-            "Motivation",
-            ["Low","Medium","High"]
-        )
-
-        teacher = st.selectbox(
-            "Teacher Quality",
-            ["Poor","Average","Good"]
-        )
-
-        school = st.selectbox(
-            "School Type",
-            ["Public","Private"]
-        )
-
-        internet = st.selectbox(
-            "Internet Access",
-            ["No","Yes"]
-        )
-
-    income = st.selectbox(
-        "Family Income",
-        ["Low","Medium","High"]
-    )
-
-    parent_involvement = st.selectbox(
-        "Parental Involvement",
-        ["Low","Medium","High"]
-    )
-
-    parent_education = st.selectbox(
-        "Parent Education",
-        ["School","College"]
-    )
-
-    peer = st.selectbox(
-        "Peer Influence",
-        ["Negative","Neutral","Positive"]
-    )
-
-    resources = st.selectbox(
-        "Learning Resources",
-        ["Low","Medium","High"]
-    )
-
-    activities = st.selectbox(
-        "Extracurricular Activities",
-        ["No","Yes"]
-    )
-
-    st.markdown("---")
-
-    if st.button(
-        "🔮 Predict Score",
-        use_container_width=True
-    ):
-
-        score = calculate_score(
-            hours,
-            attendance,
-            previous,
-            sleep,
-            motivation,
-            teacher,
-            school,
-            internet,
-            income,
-            parent_involvement,
-            parent_education,
-            peer,
-            resources,
-            activities
-        )
-
-        if score >= 90:
-            grade = "A+"
-            color = "#FFD700"
-
-        elif score >= 80:
-            grade = "A"
-            color = "#92FE9D"
-
-        elif score >= 70:
-            grade = "B"
-            color = "#64E986"
-
-        elif score >= 60:
-            grade = "C"
-            color = "#FFD700"
-
-        elif score >= 50:
-            grade = "D"
-            color = "#FFA500"
-
-        else:
-            grade = "F"
-            color = "#FF6B6B"
-
         st.markdown(f"""
-        <div style="
-            background:#1a1a2e;
-            padding:30px;
-            border-radius:20px;
-            text-align:center;
-            border:2px solid #00FFD1;
-        ">
+        <div class="glass">
 
-        <h2 style="color:#00FFD1;">
-            Predicted Score
-        </h2>
+        <h2>👤 Profile</h2>
 
-        <h1 style="
-            font-size:72px;
-            color:white;
-        ">
-            {score}/100
-        </h1>
+        <p><b>Name:</b>
+        {st.session_state.user_name}</p>
 
-        <div style="
-            background:{color};
-            padding:10px;
-            border-radius:20px;
-        ">
-            <h3 style="color:black;">
-                Grade : {grade}
-            </h3>
-        </div>
+        <p><b>Status:</b>
+        Active User</p>
+
+        <p><b>Login Time:</b>
+        {datetime.now().strftime("%H:%M")}</p>
 
         </div>
         """, unsafe_allow_html=True)
 
-        st.progress(score / 100)
+        st.markdown("## 📌 Features")
 
-        chart1, chart2 = st.columns(2)
+        st.markdown("""
+        - AI Score Prediction
+        - Analytics Dashboard
+        - Performance Charts
+        - Download Report
+        - Premium UI
+        """)
 
-        with chart1:
+        if st.button("🚪 Logout"):
 
-            fig, ax = plt.subplots(figsize=(5,5))
+            logout_user()
 
-            values = [score,100-score]
+    # ======================================
+    # TITLE
+    # ======================================
 
-            labels = [
-                "Score",
-                "Remaining"
-            ]
+    st.markdown("""
+    <h1 style='text-align:center;'>
+    🎓 AI Student Performance Predictor
+    </h1>
+    """, unsafe_allow_html=True)
 
-            colors = [
-                "#00FFD1",
-                "#2C5364"
-            ]
+    st.markdown("---")
 
-            ax.pie(
-                values,
-                labels=labels,
-                autopct="%1.1f%%",
-                colors=colors
+    # ======================================
+    # TABS
+    # ======================================
+
+    tab1, tab2, tab3 = st.tabs([
+        "📊 Prediction",
+        "📈 Analytics",
+        "👤 Profile"
+    ])
+
+    # ======================================
+    # TAB 1
+    # ======================================
+
+    with tab1:
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+
+            hours = st.number_input(
+                "Study Hours",
+                0.0,
+                24.0,
+                5.0
             )
 
-            st.pyplot(fig)
+            attendance = st.number_input(
+                "Attendance %",
+                0.0,
+                100.0,
+                80.0
+            )
 
-        with chart2:
+            previous = st.number_input(
+                "Previous Score",
+                0.0,
+                100.0,
+                70.0
+            )
 
-            fig2, ax2 = plt.subplots(figsize=(5,5))
+        with col2:
 
-            categories = [
-                "Your Score",
-                "Average",
-                "Target"
-            ]
+            sleep = st.number_input(
+                "Sleep Hours",
+                0.0,
+                12.0,
+                7.0
+            )
 
-            values2 = [
-                score,
-                65,
-                85
-            ]
+            motivation = st.selectbox(
+                "Motivation Level",
+                ["Low", "Medium", "High"]
+            )
 
-            ax2.bar(
-                categories,
-                values2,
-                color=[
+            internet = st.selectbox(
+                "Internet Access",
+                ["No", "Yes"]
+            )
+
+        st.markdown("---")
+
+        if st.button(
+            "🔮 Predict Performance"
+        ):
+
+            score = calculate_score(
+                hours,
+                attendance,
+                previous,
+                sleep,
+                motivation,
+                internet
+            )
+
+            # ==================================
+            # GRADE
+            # ==================================
+
+            if score >= 90:
+                grade = "A+"
+                color = "#00FFD1"
+
+            elif score >= 80:
+                grade = "A"
+                color = "#92FE9D"
+
+            elif score >= 70:
+                grade = "B"
+                color = "#FFD700"
+
+            elif score >= 60:
+                grade = "C"
+                color = "#FFA500"
+
+            else:
+                grade = "F"
+                color = "#FF6B6B"
+
+            # ==================================
+            # RESULT CARD
+            # ==================================
+
+            st.markdown(f"""
+            <div class="glass">
+
+            <h2 style="
+            text-align:center;
+            color:#00FFD1;
+            ">
+            🎯 Predicted Performance
+            </h2>
+
+            <h1 style="
+            text-align:center;
+            font-size:90px;
+            font-weight:bold;
+            color:white;
+            ">
+            {score}
+            </h1>
+
+            <h3 style="
+            text-align:center;
+            color:{color};
+            ">
+            Grade : {grade}
+            </h3>
+
+            <hr>
+
+            <p style="text-align:center;">
+            AI Analysis:
+            Your academic performance shows
+            strong improvement potential.
+            Stay consistent and focused.
+            </p>
+
+            </div>
+            """, unsafe_allow_html=True)
+
+            st.progress(score / 100)
+
+            # ==================================
+            # CHARTS
+            # ==================================
+
+            chart1, chart2 = st.columns(2)
+
+            # DONUT CHART
+
+            with chart1:
+
+                fig, ax = plt.subplots(figsize=(5,5))
+
+                ax.pie(
+                    [score, 100-score],
+                    labels=["Score", "Remaining"],
+                    startangle=90,
+                    wedgeprops=dict(width=0.4),
+                    autopct="%1.1f%%"
+                )
+
+                centre_circle = plt.Circle(
+                    (0,0),
+                    0.70,
+                    fc='black'
+                )
+
+                fig.gca().add_artist(
+                    centre_circle
+                )
+
+                st.pyplot(fig)
+
+            # BAR CHART
+
+            with chart2:
+
+                fig2, ax2 = plt.subplots(figsize=(5,5))
+
+                categories = [
+                    "Your Score",
+                    "Average",
+                    "Target"
+                ]
+
+                values = [
+                    score,
+                    65,
+                    90
+                ]
+
+                colors = [
                     "#00FFD1",
                     "#FFA500",
                     "#FF6B6B"
                 ]
+
+                ax2.bar(
+                    categories,
+                    values,
+                    color=colors
+                )
+
+                ax2.set_ylim(0,100)
+
+                st.pyplot(fig2)
+
+            # ==================================
+            # INSIGHTS
+            # ==================================
+
+            st.markdown("## 📌 Performance Insights")
+
+            if score >= 85:
+
+                st.success(
+                    "Excellent performance. Keep it up!"
+                )
+
+            elif score >= 70:
+
+                st.info(
+                    "Good performance. Improve consistency."
+                )
+
+            elif score >= 50:
+
+                st.warning(
+                    "Average performance. Focus more."
+                )
+
+            else:
+
+                st.error(
+                    "Needs serious improvement."
+                )
+
+            # ==================================
+            # DOWNLOAD REPORT
+            # ==================================
+
+            report = f"""
+AI STUDENT REPORT
+
+Name:
+{st.session_state.user_name}
+
+Predicted Score:
+{score}
+
+Grade:
+{grade}
+
+Generated On:
+{datetime.now()}
+"""
+
+            st.download_button(
+                "📥 Download Report",
+                report,
+                file_name="student_report.txt"
             )
 
-            ax2.set_ylim(0,100)
+    # ======================================
+    # TAB 2
+    # ======================================
 
-            st.pyplot(fig2)
+    with tab2:
+
+        st.markdown("""
+        <div class='glass'>
+        <h2>📈 Analytics Dashboard</h2>
+
+        <p>
+        This dashboard helps students
+        analyze their academic growth.
+        </p>
+
+        </div>
+        """, unsafe_allow_html=True)
+
+        data = pd.DataFrame({
+
+            "Subjects": [
+                "Math",
+                "Science",
+                "English",
+                "Computer"
+            ],
+
+            "Marks": [
+                78,
+                85,
+                72,
+                90
+            ]
+        })
+
+        st.dataframe(data)
+
+        fig3, ax3 = plt.subplots(figsize=(8,4))
+
+        ax3.plot(
+            data["Subjects"],
+            data["Marks"],
+            marker="o"
+        )
+
+        ax3.set_ylim(0,100)
+
+        st.pyplot(fig3)
+
+    # ======================================
+    # TAB 3
+    # ======================================
+
+    with tab3:
+
+        st.markdown(f"""
+        <div class='glass'>
+
+        <h2>👤 User Profile</h2>
+
+        <p><b>Name:</b>
+        {st.session_state.user_name}</p>
+
+        <p><b>Username:</b>
+        {st.session_state.username}</p>
+
+        <p><b>Status:</b>
+        Premium Dashboard User</p>
+
+        <p><b>System:</b>
+        AI Powered Prediction</p>
+
+        </div>
+        """, unsafe_allow_html=True)
+
+    # ======================================
+    # FOOTER
+    # ======================================
+
+    st.markdown("""
+    <hr>
+
+    <center>
+
+    Made with ❤️ using Streamlit
+
+    </center>
+    """, unsafe_allow_html=True)
 
 # ==========================================
 # ROUTING
 # ==========================================
-if "admin_page" not in st.session_state:
-    st.session_state.admin_page = False
+if st.session_state.logged_in:
 
-if st.session_state.admin_page and not st.session_state.logged_in:
-
-    admin_login_page()
-
-elif not st.session_state.logged_in:
-
-    if st.session_state.show_register:
-
-        show_register_page()
-
-    else:
-
-        show_login_page()
+    main_app()
 
 else:
 
-    if st.session_state.is_admin:
-
-        admin_dashboard()
-
-    else:
-
-        main_app()
+    show_login()
