@@ -254,8 +254,9 @@ def show_admin_page():
         if st.button("📥 Backup Users Data"):
             st.success("Backup created!")
         if st.button("🔄 Reset to Default Users"):
-            global users_db
-            users_db = default_users.copy()
+            # Update the global users_db
+            users_db.clear()
+            users_db.update(default_users)
             save_users(users_db)
             st.success("Reset successful!")
             st.rerun()
