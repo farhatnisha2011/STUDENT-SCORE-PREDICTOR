@@ -15,17 +15,10 @@ st.set_page_config(
 )
 
 # ==========================================
-# THEME MODE
+# THEME MODE - Initialize first
 # ==========================================
 if "theme_mode" not in st.session_state:
     st.session_state.theme_mode = "dark"
-
-def toggle_theme():
-    if st.session_state.theme_mode == "dark":
-        st.session_state.theme_mode = "light"
-    else:
-        st.session_state.theme_mode = "dark"
-    st.rerun()
 
 # ==========================================
 # USER DATABASE
@@ -82,6 +75,84 @@ if "show_register" not in st.session_state:
     st.session_state.show_register = False
 
 # ==========================================
+# THEME CSS
+# ==========================================
+def apply_theme():
+    if st.session_state.theme_mode == "dark":
+        st.markdown("""
+        <style>
+        .stApp {
+            background: linear-gradient(135deg, #0F2027, #203A43, #2C5364) !important;
+        }
+        h1, h2, h3, h4, p, label, span, div, .stMarkdown {
+            color: white !important;
+        }
+        .stTextInput input, .stNumberInput input {
+            background-color: #1a1a2e !important;
+            color: white !important;
+            border: 1px solid #00FFD1 !important;
+            border-radius: 8px !important;
+        }
+        .stSelectbox div[data-baseweb="select"] {
+            background-color: #1a1a2e !important;
+            border: 1px solid #00FFD1 !important;
+            border-radius: 8px !important;
+        }
+        .stSelectbox div[data-baseweb="select"] div {
+            color: white !important;
+            background-color: #1a1a2e !important;
+        }
+        .stButton button {
+            background: linear-gradient(to right, #00C9FF, #92FE9D) !important;
+            color: black !important;
+            font-weight: bold !important;
+            border-radius: 10px !important;
+        }
+        .stSlider div {
+            color: white !important;
+        }
+        .stAlert {
+            background-color: #1a1a2e !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <style>
+        .stApp {
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2) !important;
+        }
+        h1, h2, h3, h4, p, label, span, div, .stMarkdown {
+            color: #1a1a2e !important;
+        }
+        .stTextInput input, .stNumberInput input {
+            background-color: white !important;
+            color: #1a1a2e !important;
+            border: 1px solid #00C9FF !important;
+            border-radius: 8px !important;
+        }
+        .stSelectbox div[data-baseweb="select"] {
+            background-color: white !important;
+            border: 1px solid #00C9FF !important;
+            border-radius: 8px !important;
+        }
+        .stSelectbox div[data-baseweb="select"] div {
+            color: #1a1a2e !important;
+            background-color: white !important;
+        }
+        .stButton button {
+            background: linear-gradient(to right, #00C9FF, #92FE9D) !important;
+            color: black !important;
+            font-weight: bold !important;
+            border-radius: 10px !important;
+        }
+        .stSlider div {
+            color: #1a1a2e !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+# ==========================================
 # PREDICTION FUNCTION
 # ==========================================
 def calculate_score(hours, attendance, previous, sleep, motivation, teacher, 
@@ -135,21 +206,33 @@ def login_user(username, user_data):
         st.session_state.child_name = user_data.get("child_name", "Child")
 
 def logout_user():
+    for key in list(st.session_state.keys()):
+        if key not in ["theme_mode", "show_register"]:
+            del st.session_state[key]
     st.session_state.logged_in = False
+    st.rerun()
+
+def toggle_theme():
+    if st.session_state.theme_mode == "dark":
+        st.session_state.theme_mode = "light"
+    else:
+        st.session_state.theme_mode = "dark"
     st.rerun()
 
 # ==========================================
 # LOGIN PAGE
 # ==========================================
 def show_login_page():
+    apply_theme()
+    
     # Theme Toggle
     col1, col2, col3 = st.columns([1, 2, 1])
     with col3:
         if st.session_state.theme_mode == "dark":
-            if st.button("☀️ Light Mode"):
+            if st.button("☀️ Light Mode", key="theme_login"):
                 toggle_theme()
         else:
-            if st.button("🌙 Dark Mode"):
+            if st.button("🌙 Dark Mode", key="theme_login"):
                 toggle_theme()
     
     # Title
@@ -193,6 +276,8 @@ def show_login_page():
 # REGISTER PAGE
 # ==========================================
 def show_register_page():
+    apply_theme()
+    
     st.markdown("<h1 style='text-align: center;'>📝 Create Account</h1>", unsafe_allow_html=True)
     st.markdown("---")
     
@@ -241,8 +326,20 @@ def show_register_page():
 # MAIN APP
 # ==========================================
 def main_app():
+    apply_theme()
+    
     # Admin Panel
     if st.session_state.user_role == "admin":
+        # Theme Toggle
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col3:
+            if st.session_state.theme_mode == "dark":
+                if st.button("☀️ Light Mode", key="theme_admin"):
+                    toggle_theme()
+            else:
+                if st.button("🌙 Dark Mode", key="theme_admin"):
+                    toggle_theme()
+        
         st.markdown("<h1 style='text-align: center;'>🛡️ Admin Panel</h1>", unsafe_allow_html=True)
         st.markdown("---")
         
@@ -271,18 +368,17 @@ def main_app():
         return
     
     # Regular User Interface
-    # Theme Toggle
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col3:
-        if st.session_state.theme_mode == "dark":
-            if st.button("☀️ Light Mode"):
-                toggle_theme()
-        else:
-            if st.button("🌙 Dark Mode"):
-                toggle_theme()
-    
     # Sidebar
     with st.sidebar:
+        # Theme Toggle in Sidebar
+        if st.session_state.theme_mode == "dark":
+            if st.button("☀️ Light Mode", use_container_width=True):
+                toggle_theme()
+        else:
+            if st.button("🌙 Dark Mode", use_container_width=True):
+                toggle_theme()
+        
+        st.markdown("---")
         st.markdown(f"### 👤 {st.session_state.user_name}")
         st.markdown(f"**Role:** {st.session_state.user_role.title()}")
         if st.session_state.user_role == "parent":
@@ -307,144 +403,150 @@ def main_app():
     
     st.markdown("---")
     
-    # Input Form
-    with st.form("prediction_form"):
-        st.markdown("### 📚 Academic Information")
+    # Input Form - NOT using st.form to avoid download button issue
+    st.markdown("### 📚 Academic Information")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        hours = st.number_input("Hours Studied (per day)", min_value=0.0, max_value=24.0, value=5.0, step=0.5)
+        attendance = st.number_input("Attendance (%)", min_value=0.0, max_value=100.0, value=75.0, step=1.0)
+        previous = st.number_input("Previous Score (%)", min_value=0.0, max_value=100.0, value=65.0, step=1.0)
+    
+    with col2:
+        sleep = st.number_input("Sleep Hours (per day)", min_value=0.0, max_value=12.0, value=7.0, step=0.5)
+        motivation = st.selectbox("Motivation Level", ["Low", "Medium", "High"])
+        teacher = st.selectbox("Teacher Quality", ["Poor", "Average", "Good"])
+    
+    st.markdown("---")
+    st.markdown("### 🏫 School & Family Background")
+    
+    col3, col4 = st.columns(2)
+    with col3:
+        school = st.selectbox("School Type", ["Public", "Private"])
+        internet = st.selectbox("Internet Access", ["No", "Yes"])
+        income = st.selectbox("Family Income", ["Low", "Medium", "High"])
+    
+    with col4:
+        parent_involvement = st.selectbox("Parental Involvement", ["Low", "Medium", "High"])
+        parent_education = st.selectbox("Parent Education", ["School", "College"])
+        peer = st.selectbox("Peer Influence", ["Negative", "Neutral", "Positive"])
+    
+    st.markdown("---")
+    st.markdown("### 🎯 Additional Resources")
+    
+    col5, col6 = st.columns(2)
+    with col5:
+        resources = st.selectbox("Learning Resources", ["Low", "Medium", "High"])
+    
+    with col6:
+        activities = st.selectbox("Extracurricular Activities", ["No", "Yes"])
+    
+    st.markdown("---")
+    
+    # Predict button (outside form)
+    if st.button("🔮 Predict Score", use_container_width=True):
+        # Calculate score
+        score = calculate_score(
+            hours, attendance, previous, sleep, motivation, teacher,
+            school, internet, income, parent_involvement, parent_education,
+            peer, resources, activities
+        )
         
-        col1, col2 = st.columns(2)
-        with col1:
-            hours = st.number_input("Hours Studied (per day)", min_value=0.0, max_value=24.0, value=5.0, step=0.5)
-            attendance = st.number_input("Attendance (%)", min_value=0.0, max_value=100.0, value=75.0, step=1.0)
-            previous = st.number_input("Previous Score (%)", min_value=0.0, max_value=100.0, value=65.0, step=1.0)
+        # Determine grade
+        if score >= 90:
+            grade = "A+"
+            color = "#FFD700"
+            message = "🏆 Outstanding! Keep up the excellent work!"
+        elif score >= 80:
+            grade = "A"
+            color = "#92FE9D"
+            message = "🎉 Excellent! You're doing great!"
+        elif score >= 70:
+            grade = "B"
+            color = "#64E986"
+            message = "👍 Good job! A little more effort for an A!"
+        elif score >= 60:
+            grade = "C"
+            color = "#FFD700"
+            message = "📚 Not bad! Focus on weaker areas."
+        elif score >= 50:
+            grade = "D"
+            color = "#FFA500"
+            message = "⚠️ Needs improvement. Study harder!"
+        else:
+            grade = "F"
+            color = "#FF6B6B"
+            message = "❌ Failing. Immediate action required!"
         
-        with col2:
-            sleep = st.number_input("Sleep Hours (per day)", min_value=0.0, max_value=12.0, value=7.0, step=0.5)
-            motivation = st.selectbox("Motivation Level", ["Low", "Medium", "High"])
-            teacher = st.selectbox("Teacher Quality", ["Poor", "Average", "Good"])
-        
+        # Display results
         st.markdown("---")
-        st.markdown("### 🏫 School & Family Background")
-        
-        col3, col4 = st.columns(2)
-        with col3:
-            school = st.selectbox("School Type", ["Public", "Private"])
-            internet = st.selectbox("Internet Access", ["No", "Yes"])
-            income = st.selectbox("Family Income", ["Low", "Medium", "High"])
-        
-        with col4:
-            parent_involvement = st.selectbox("Parental Involvement", ["Low", "Medium", "High"])
-            parent_education = st.selectbox("Parent Education", ["School", "College"])
-            peer = st.selectbox("Peer Influence", ["Negative", "Neutral", "Positive"])
-        
-        st.markdown("---")
-        st.markdown("### 🎯 Additional Resources")
-        
-        col5, col6 = st.columns(2)
-        with col5:
-            resources = st.selectbox("Learning Resources", ["Low", "Medium", "High"])
-        
-        with col6:
-            activities = st.selectbox("Extracurricular Activities", ["No", "Yes"])
-        
-        st.markdown("---")
-        
-        # Submit button
-        submitted = st.form_submit_button("🔮 Predict Score", use_container_width=True)
-        
-        if submitted:
-            # Calculate score
-            score = calculate_score(
-                hours, attendance, previous, sleep, motivation, teacher,
-                school, internet, income, parent_involvement, parent_education,
-                peer, resources, activities
-            )
-            
-            # Determine grade
-            if score >= 90:
-                grade = "A+"
-                color = "#FFD700"
-                message = "🏆 Outstanding! Keep up the excellent work!"
-            elif score >= 80:
-                grade = "A"
-                color = "#92FE9D"
-                message = "🎉 Excellent! You're doing great!"
-            elif score >= 70:
-                grade = "B"
-                color = "#64E986"
-                message = "👍 Good job! A little more effort for an A!"
-            elif score >= 60:
-                grade = "C"
-                color = "#FFD700"
-                message = "📚 Not bad! Focus on weaker areas."
-            elif score >= 50:
-                grade = "D"
-                color = "#FFA500"
-                message = "⚠️ Needs improvement. Study harder!"
-            else:
-                grade = "F"
-                color = "#FF6B6B"
-                message = "❌ Failing. Immediate action required!"
-            
-            # Display results
-            st.markdown("---")
-            st.markdown(f"""
-            <div style="background: linear-gradient(135deg, #1a1a2e, #16213e); 
-                        padding: 30px; border-radius: 20px; text-align: center; 
-                        border: 2px solid #00FFD1;">
-                <h2 style="color: #00FFD1;">📊 PREDICTED SCORE</h2>
-                <h1 style="font-size: 72px; color: white;">{score}<span style="font-size: 24px;">/100</span></h1>
-                <div style="background: {color}; display: inline-block; padding: 10px 30px; border-radius: 50px;">
-                    <h3 style="color: black;">Grade: {grade}</h3>
-                </div>
-                <p style="color: white; margin-top: 20px;">{message}</p>
+        st.markdown(f"""
+        <div style="background: linear-gradient(135deg, #1a1a2e, #16213e); 
+                    padding: 30px; border-radius: 20px; text-align: center; 
+                    border: 2px solid #00FFD1;">
+            <h2 style="color: #00FFD1;">📊 PREDICTED SCORE</h2>
+            <h1 style="font-size: 72px; color: white;">{score}<span style="font-size: 24px;">/100</span></h1>
+            <div style="background: {color}; display: inline-block; padding: 10px 30px; border-radius: 50px;">
+                <h3 style="color: black;">Grade: {grade}</h3>
             </div>
-            """, unsafe_allow_html=True)
-            
-            # Progress bar
-            st.progress(score / 100)
-            
-            # Charts
-            chart_col1, chart_col2 = st.columns(2)
-            
-            with chart_col1:
-                fig, ax = plt.subplots(figsize=(5, 5))
-                values = [score, 100 - score]
-                labels = ["Your Score", "Remaining"]
-                colors = ["#00FFD1", "#2C5364"]
-                ax.pie(values, labels=labels, autopct='%1.1f%%', colors=colors)
-                ax.set_title("Score Distribution")
-                st.pyplot(fig)
-            
-            with chart_col2:
-                fig2, ax2 = plt.subplots(figsize=(5, 5))
-                categories = ['Your Score', 'Class Average', 'Target']
-                values2 = [score, 65, 85]
-                ax2.bar(categories, values2, color=['#00FFD1', '#FFA500', '#FF6B6B'])
-                ax2.set_ylim(0, 100)
-                ax2.set_ylabel('Score')
-                ax2.set_title('Performance Comparison')
-                st.pyplot(fig2)
-            
-            # Insights
-            st.subheader("💡 Insights")
-            
-            if hours >= 6:
-                st.success(f"✅ Study Time: {hours} hours - Great!")
-            else:
-                st.warning(f"⚠️ Study Time: {hours} hours - Try to study 6+ hours")
-            
-            if attendance >= 85:
-                st.success(f"✅ Attendance: {attendance}% - Excellent!")
-            else:
-                st.warning(f"⚠️ Attendance: {attendance}% - Higher attendance = better scores")
-            
-            if sleep >= 7:
-                st.success(f"✅ Sleep: {sleep} hours - Perfect!")
-            else:
-                st.warning(f"⚠️ Sleep: {sleep} hours - Aim for 7-8 hours")
-            
-            # Download report
-            report = f"""
+            <p style="color: white; margin-top: 20px;">{message}</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Progress bar
+        st.progress(score / 100)
+        
+        # Charts
+        chart_col1, chart_col2 = st.columns(2)
+        
+        with chart_col1:
+            fig, ax = plt.subplots(figsize=(5, 5))
+            if st.session_state.theme_mode == "dark":
+                fig.patch.set_facecolor('#0F2027')
+                ax.set_facecolor('#0F2027')
+                ax.set_title("Score Distribution", color='white')
+            values = [score, 100 - score]
+            labels = ["Your Score", "Remaining"]
+            colors = ["#00FFD1", "#2C5364"]
+            ax.pie(values, labels=labels, autopct='%1.1f%%', colors=colors)
+            st.pyplot(fig)
+        
+        with chart_col2:
+            fig2, ax2 = plt.subplots(figsize=(5, 5))
+            if st.session_state.theme_mode == "dark":
+                fig2.patch.set_facecolor('#0F2027')
+                ax2.set_facecolor('#0F2027')
+                ax2.set_title('Performance Comparison', color='white')
+                ax2.set_ylabel('Score', color='white')
+                ax2.tick_params(colors='white')
+            categories = ['Your Score', 'Class Average', 'Target']
+            values2 = [score, 65, 85]
+            ax2.bar(categories, values2, color=['#00FFD1', '#FFA500', '#FF6B6B'])
+            ax2.set_ylim(0, 100)
+            ax2.set_ylabel('Score')
+            ax2.set_title('Performance Comparison')
+            st.pyplot(fig2)
+        
+        # Insights
+        st.subheader("💡 Insights")
+        
+        if hours >= 6:
+            st.success(f"✅ Study Time: {hours} hours - Great!")
+        else:
+            st.warning(f"⚠️ Study Time: {hours} hours - Try to study 6+ hours")
+        
+        if attendance >= 85:
+            st.success(f"✅ Attendance: {attendance}% - Excellent!")
+        else:
+            st.warning(f"⚠️ Attendance: {attendance}% - Higher attendance = better scores")
+        
+        if sleep >= 7:
+            st.success(f"✅ Sleep: {sleep} hours - Perfect!")
+        else:
+            st.warning(f"⚠️ Sleep: {sleep} hours - Aim for 7-8 hours")
+        
+        # Download report (outside form, so it works)
+        report = f"""
 STUDENT SCORE REPORT
 ====================
 Name: {st.session_state.user_name}
@@ -474,7 +576,7 @@ Activities: {activities}
 
 {message}
 """
-            st.download_button("📥 Download Report", report, file_name=f"report_{score}.txt")
+        st.download_button("📥 Download Report", report, file_name=f"report_{score}.txt")
 
 # ==========================================
 # APP ROUTING
