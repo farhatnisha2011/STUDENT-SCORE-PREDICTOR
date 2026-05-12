@@ -570,7 +570,7 @@ def main_app():
 
     with top3:
 
-        if st.button("🚪"):
+        if st.button("🚪LOGOUT"):
 
             logout_user()
 
