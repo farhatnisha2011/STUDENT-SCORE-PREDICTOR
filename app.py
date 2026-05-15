@@ -126,6 +126,27 @@ div[data-baseweb="select"] *{
     box-shadow:0 0 20px #00FFD1;
 }
 
+/* DOWNLOAD BUTTON */
+.stDownloadButton button{
+    background:linear-gradient(135deg,#00C9FF,#92FE9D) !important;
+    color:black !important;
+    font-weight:bold !important;
+    border:none !important;
+    border-radius:14px !important;
+    padding:12px 24px !important;
+    font-size:15px !important;
+    transition:0.3s;
+}
+.stDownloadButton button:hover{
+    transform:scale(1.03);
+    box-shadow:0 0 20px #00FFD1;
+}
+.stDownloadButton button p,
+.stDownloadButton button span{
+    color:black !important;
+    font-weight:bold !important;
+}
+
 /* SIDEBAR */
 [data-testid="stSidebar"]{
     background:#0f172a !important;
