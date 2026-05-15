@@ -478,50 +478,46 @@ Generated On: {datetime.now()}
             "Marks":    [78, 85, 72, 90]
         })
 
-        # ── STYLED HTML TABLE (replaces plain st.dataframe) ──
+        # ── STYLED HTML TABLE ──
         def get_badge(mark):
             if mark >= 85:
-                return f"<span class='badge' style='background:rgba(0,255,209,0.2);color:#00FFD1;'>Excellent</span>"
+                return "<span style='display:inline-block;padding:3px 12px;border-radius:20px;font-size:13px;font-weight:bold;background:#00FFD122;color:#00FFD1;'>Excellent</span>"
             elif mark >= 70:
-                return f"<span class='badge' style='background:rgba(255,215,0,0.2);color:#FFD700;'>Good</span>"
+                return "<span style='display:inline-block;padding:3px 12px;border-radius:20px;font-size:13px;font-weight:bold;background:#FFD70022;color:#FFD700;'>Good</span>"
             else:
-                return f"<span class='badge' style='background:rgba(255,107,107,0.2);color:#FF6B6B;'>Needs Work</span>"
+                return "<span style='display:inline-block;padding:3px 12px;border-radius:20px;font-size:13px;font-weight:bold;background:#FF6B6B22;color:#FF6B6B;'>Needs Work</span>"
 
-        rows = ""
+        th_style = "background:#00FFD122;color:#00FFD1;padding:12px 20px;text-align:left;font-size:15px;font-weight:700;border-bottom:2px solid #00FFD1;"
+        td_style = "padding:11px 20px;border-bottom:1px solid #ffffff14;color:white;font-size:14px;"
+
+        row_parts = []
         for _, row in data.iterrows():
-            badge = get_badge(row["Marks"])
+            badge = get_badge(int(row["Marks"]))
             bar_w = int(row["Marks"])
-            rows += f"""
-            <tr>
-              <td><b>{row['Subjects']}</b></td>
-              <td>
-                <div style="display:flex;align-items:center;gap:10px;">
-                  <div style="
-                    width:{bar_w}%;
-                    max-width:160px;
-                    height:8px;
-                    background:linear-gradient(90deg,#00C9FF,#92FE9D);
-                    border-radius:4px;
-                  "></div>
-                  <span style="color:white;font-weight:bold;">{row['Marks']}</span>
-                </div>
-              </td>
-              <td>{badge}</td>
-            </tr>
-            """
+            bar = (
+                f"<div style='display:flex;align-items:center;gap:10px;'>"
+                f"<div style='width:{bar_w}%;max-width:160px;height:8px;"
+                f"background:linear-gradient(90deg,#00C9FF,#92FE9D);border-radius:4px;'></div>"
+                f"<span style='color:white;font-weight:bold;'>{bar_w}</span></div>"
+            )
+            row_parts.append(
+                f"<tr style='background:rgba(255,255,255,0.04);'>"
+                f"<td style='{td_style}'><b>{row['Subjects']}</b></td>"
+                f"<td style='{td_style}'>{bar}</td>"
+                f"<td style='{td_style}'>{badge}</td></tr>"
+            )
 
-        st.markdown(f"""
-        <table class="custom-table">
-          <thead>
-            <tr>
-              <th>📚 Subject</th>
-              <th>📊 Marks / 100</th>
-              <th>🏅 Status</th>
-            </tr>
-          </thead>
-          <tbody>{rows}</tbody>
-        </table>
-        """, unsafe_allow_html=True)
+        table_html = (
+            "<table style='width:100%;border-collapse:collapse;margin-top:16px;'>"
+            f"<thead><tr>"
+            f"<th style='{th_style}'>📚 Subject</th>"
+            f"<th style='{th_style}'>📊 Marks / 100</th>"
+            f"<th style='{th_style}'>🏅 Status</th>"
+            f"</tr></thead>"
+            f"<tbody>{''.join(row_parts)}</tbody>"
+            "</table>"
+        )
+        st.markdown(table_html, unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
 
