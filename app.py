@@ -212,7 +212,7 @@ def apply_dark_style(fig, ax):
     ax.yaxis.label.set_color('white')
     ax.title.set_color('white')
     for spine in ax.spines.values():
-        spine.set_edgecolor('rgba(255,255,255,0.1)')
+        spine.set_edgecolor((1, 1, 1, 0.1))
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     return fig, ax
@@ -432,7 +432,7 @@ def main_app():
                              str(val), ha='center', va='bottom',
                              color='white', fontweight='bold', fontsize=13)
                 ax2.set_ylim(0, 110)
-                ax2.grid(axis='y', color='rgba(255,255,255,0.07)', linewidth=0.8)
+                ax2.grid(axis='y', color=(1,1,1,0.07), linewidth=0.8)
                 ax2.set_axisbelow(True)
                 st.pyplot(fig2)
                 plt.close(fig2)
@@ -546,7 +546,7 @@ Generated On: {datetime.now()}
             ax3.set_ylim(0, 110)
             ax3.set_title("Subject-wise Performance", color='white',
                           fontsize=13, pad=12)
-            ax3.grid(axis='y', color='rgba(255,255,255,0.07)', linewidth=0.8)
+            ax3.grid(axis='y', color=(1,1,1,0.07), linewidth=0.8)
             ax3.set_axisbelow(True)
             fig3.tight_layout()
             st.pyplot(fig3)
@@ -573,7 +573,7 @@ Generated On: {datetime.now()}
                           fontsize=13, pad=12)
             ax4.legend(facecolor="#111827", edgecolor="none",
                        labelcolor="white", fontsize=10)
-            ax4.grid(axis='y', color='rgba(255,255,255,0.07)', linewidth=0.8)
+            ax4.grid(axis='y', color=(1,1,1,0.07), linewidth=0.8)
             ax4.set_axisbelow(True)
             fig4.tight_layout()
             st.pyplot(fig4)
